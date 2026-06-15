@@ -1,0 +1,9 @@
+# We use prettier only for formats not yet supported by biome.
+*.css
+*.html
+*.js
+*.json
+*.jsonc
+*.ts
+*.webmanifest
+pnpm-lock.yaml

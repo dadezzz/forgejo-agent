@@ -1,0 +1,26 @@
+{
+  "name": "pi",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "rolldown -c",
+    "check": "tsc",
+    "format:check": "biome format",
+    "format:fix": "biome format --fix",
+    "lint:check": "biome lint",
+    "lint:fix": "biome lint --fix"
+  },
+  "dependencies": {
+    "@earendil-works/pi-coding-agent": "0.79.3",
+    "typebox": "1.2.10"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.0",
+    "@rollup/plugin-node-resolve": "16.0.3",
+    "@rollup/plugin-typescript": "12.3.0",
+    "@types/node": "25.9.3",
+    "rolldown": "1.1.1",
+    "rollup": "4.62.0",
+    "typescript": "6.0.3"
+  }
+}

@@ -1,0 +1,20 @@
+name: forgejo-agent
+description: Runs pi agent
+
+inputs:
+  token:
+    description: Token
+    required: true
+  issue_number:
+    description: Issue number
+    required: true
+  model:
+    description: Issue number
+    required: true
+  models_json:
+    description: Issue number
+    required: true
+
+runs:
+  using: docker
+  image: docker://git.zarantonello.dev/davide/forgejo-agent:latest

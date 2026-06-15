@@ -1,0 +1,13 @@
+/.devcontainer/
+/.forgejo
+/.git
+/.gitignore
+/.prettierignore
+/.pnpm-store/
+/.renovaterc.json
+/.yamllint.yml
+/biome.jsonc
+/dist/
+/Dockerfile
+/node_modules/
+/README.md
