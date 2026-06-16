@@ -1,7 +1,7 @@
 jobs:
   respond:
     container:
-      image: git.zarantonello.dev/davide/forgejo-agent:ci
+      image: git.zarantonello.dev/infra/forgejo-agent:ci
     name: LLM Bot response generation
     runs-on: srv-0-thi-home
     steps:
@@ -10,7 +10,7 @@ jobs:
           git clone --filter=blob:none --no-checkout https://${{ secrets.AGENT_TOKEN }}@git.zarantonello.dev/${{ forge.repository }} ${{ forge.workspace }};
           git checkout --quiet ${{ forge.sha }};
       - name: Generate response
-        uses: https://git.zarantonello.dev/davide/forgejo-agent@main
+        uses: https://git.zarantonello.dev/infra/forgejo-agent@main
         with:
           issue_number: ${{ forge.event.issue.number }}
           models_json: '{"providers":{"llama-server":{"baseUrl":"http://llama.zarantonello.dev/v1","api":"openai-completions","apiKey":"llama","models":[{"id":"Qwen3.6-35B-A3B","contextWindow":65536}]}}}'

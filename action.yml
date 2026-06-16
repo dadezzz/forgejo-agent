@@ -17,4 +17,4 @@ inputs:
 
 runs:
   using: docker
-  image: docker://git.zarantonello.dev/davide/forgejo-agent:latest
+  image: docker://git.zarantonello.dev/infra/forgejo-agent:latest

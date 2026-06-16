@@ -1,4 +1,4 @@
-FROM git.zarantonello.dev/davide/forgejo-agent:ci AS builder
+FROM git.zarantonello.dev/infra/forgejo-agent:ci AS builder
 
 WORKDIR /srv
 
