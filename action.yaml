@@ -17,5 +17,5 @@ inputs:
 name: forgejo-agent
 
 runs:
-  image: docker://git.zarantonello.dev/infra/forgejo-agent:1.0.8
+  image: docker://git.zarantonello.dev/infra/forgejo-agent:v1.0.3
   using: docker
