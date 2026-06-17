@@ -13,11 +13,12 @@ jobs:
         uses: https://git.zarantonello.dev/infra/forgejo-agent@main
         with:
           issue_number: ${{ forge.event.issue.number }}
-          models_json: '{"providers":{"llama-server":{"baseUrl":"http://llama.zarantonello.dev/v1","api":"openai-completions","apiKey":"llama","models":[{"id":"Qwen3.6-35B-A3B","contextWindow":65536}]}}}'
           model: Qwen3.6-35B-A3B
+          models_json: |
+            {"providers":{"llama-server":{"baseUrl":"http://llama.zarantonello.dev/v1","api":"openai-completions","apiKey":"llama","models":[{"id":"Qwen3.6-35B-A3B","contextWindow":65536}]}}}
           token: ${{ secrets.AGENT_TOKEN }}
 
-on:
+"on":
   issue_comment:
     types:
       - created

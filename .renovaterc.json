@@ -1,0 +1,38 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "assignees": ["davide"],
+  "extends": [
+    "config:best-practices",
+    "customManagers:dockerfileVersions",
+    "customManagers:biomeVersions",
+    ":semanticCommits"
+  ],
+  "packageRules": [
+    {
+      "automerge": true,
+      "groupName": "CI dependencies",
+      "groupSlug": "ci",
+      "matchFileNames": [".devcontainer/**", ".forgejo/**", "ci.Dockerfile"],
+      "matchUpdateTypes": ["!major"],
+      "semanticCommitType": "ci"
+    },
+    {
+      "automerge": true,
+      "matchFileNames": ["Dockerfile"],
+      "matchUpdateTypes": ["!major"],
+      "semanticCommitType": "fix"
+    },
+    {
+      "matchFileNames": ["Dockerfile"],
+      "matchUpdateTypes": ["major"],
+      "semanticCommitType": "feat"
+    },
+    {
+      "automerge": true,
+      "matchPackageNames": ["@biomejs/biome", "@types/node", "rolldown", "typescript"],
+      "matchUpdateTypes": ["!major"],
+      "semanticCommitType": "chore"
+    }
+  ],
+  "prHourlyLimit": 4
+}

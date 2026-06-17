@@ -16,7 +16,7 @@ const contextIssueNumberSchema = Type.String({ pattern: /[0-9]+/ });
 const contextIssueNumber = Number.parseInt(Value.Parse(contextIssueNumberSchema, process.env.INPUT_ISSUE_NUMBER), 10);
 
 const contextModelSchema = Type.String({ pattern: /[0-9]+/ });
-const contextModel = Value.Parse(contextModelSchema, process.env.INPUT_MODEL);
+const _contextModel = Value.Parse(contextModelSchema, process.env.INPUT_MODEL);
 
 const issueSchema = Type.Object({
   number: Type.Number(),
@@ -97,21 +97,27 @@ if (message?.role !== "assistant") {
 
 const messageStr = message.content
   .map((m) => {
+    let message: string;
+
     switch (m.type) {
       case "text":
-        return m.text;
+        message = m.text;
+        break;
       case "thinking":
-        return "> Thinking\n";
+        message = "> Thinking\n";
+        break;
       case "toolCall":
-        return (
+        message =
           "> " +
           m.name +
           Object.entries(m.arguments)
             .map(([k, v]) => ` [${k}=${v}]`)
             .join("") +
-          "\n"
-        );
+          "\n";
+        break;
     }
+
+    return message;
   })
   .join("\n");
 

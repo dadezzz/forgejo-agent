@@ -1,10 +1,6 @@
-name: forgejo-agent
 description: Runs pi agent
 
 inputs:
-  token:
-    description: Token
-    required: true
   issue_number:
     description: Issue number
     required: true
@@ -14,7 +10,12 @@ inputs:
   models_json:
     description: Issue number
     required: true
+  token:
+    description: Token
+    required: true
+
+name: forgejo-agent
 
 runs:
-  using: docker
   image: docker://git.zarantonello.dev/infra/forgejo-agent:latest
+  using: docker
