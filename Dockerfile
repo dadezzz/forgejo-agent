@@ -1,4 +1,4 @@
-FROM git.zarantonello.dev/infra/forgejo-agent:ci AS builder
+FROM git.zarantonello.dev/infra/forgejo-agent:ci@sha256:d1463c404d50ac078446d364705009165e2b66729256c8c3c76516d03ba4bd3e AS builder
 
 WORKDIR /srv
 
