@@ -1,4 +1,19 @@
 {
   "branches": ["main"],
-  "plugins": ["@semantic-release/commit-analyzer"]
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "sed -i 's|git.zarantonello.dev/infra/forgejo-agent:.*|git.zarantonello.dev/infra/forgejo-agent:${nextRelease.gitTag}|' action.yaml"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["action.yaml"],
+        "message": "chore(release): ${nextRelease.gitTag} [skip ci]"
+      }
+    ]
+  ]
 }
