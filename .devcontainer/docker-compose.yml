@@ -1,7 +1,7 @@
 services:
   workspace:
     entrypoint: sleep infinity
-    image: git.zarantonello.dev/infra/forgejo-agent:ci@sha256:d1463c404d50ac078446d364705009165e2b66729256c8c3c76516d03ba4bd3e
+    image: git.zarantonello.dev/infra/forgejo-agent:ci@sha256:65ef7382aea7ba1853e30070dde18d90d3e4ad2ab7e3c2ed4bf366ea81659e02
     volumes:
       - ..:/workspace:z,cached
       - pnpm-cache:/usr/local/pnpm/store
