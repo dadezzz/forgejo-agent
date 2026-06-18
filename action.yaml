@@ -43,7 +43,38 @@ runs:
     - name: Run forgejo-agent
       run: |
         export CTX_EVENT_NAME="${{ forge.event_name }}_${{ forge.event.action }}"
-        export CTX_ISSUE_NUMBER="${{ forge.event.issue.number }}"
+
+        case "$CTS_EVENT_NAME" in
+          pull_request_review_requested)
+            export CTX_ISSUE_NUMBER="${{ forge.event.pull_request.number }}"
+            if [ "${{  forge.event.requested_reviewer.username" != "${{ inputs.auth-username }}" ]
+              echo "@${{ inputs.auth-username }}" was not requested for review"
+              exit 0
+            fi
+            ;;
+          pull_request_opened)
+            export CTX_ISSUE_NUMBER="${{ forge.event.pull_request.number }}"
+            if [ ! echo "${{ forge.event.pull_request.body }}" | grep "${{ inputs.auth-username }}" ]
+              echo "@${{ inputs.auth-username }}" was not requested for review"
+              exit 0
+            fi
+            ;;
+          issue_comment_created)
+            export CTX_ISSUE_NUMBER="${{ forge.event.issue.number }}"
+            if [ ! echo "${{ forge.event.comment.body }}" | grep "${{ inputs.auth-username }}" ]
+              echo "@${{ inputs.auth-username }}" was not requested for review"
+              exit 0
+            fi
+            ;;
+          issues_opened)
+            export CTX_ISSUE_NUMBER="${{ forge.event.issue.number }}"
+            if [ ! echo "${{ forge.event.issue.body }}" | grep "${{ inputs.auth-username }}" ]
+              echo "@${{ inputs.auth-username }}" was not requested for review"
+              exit 0
+            fi
+            ;;
+        esac
+
         export CTX_AUTH_TOKEN="${{ inputs.auth-token }}"
         export CTX_AUTH_USERNAME="${{ inputs.auth-username }}"
 

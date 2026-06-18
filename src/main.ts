@@ -21,12 +21,14 @@ session.subscribe((l) => {
               messageStr += m.text;
               break;
             case "thinking":
-              console.log("> start thinking");
+              console.log("### START THINKING ###");
               console.log(m.thinking);
-              console.log("> end thinking");
+              console.log("### END THINKING ###");
               break;
             case "toolCall":
-              console.log(`> tool call: ${m.name} ${JSON.stringify(m.arguments)}`);
+              console.log("### START TOOL CALL ###");
+              console.log(`${m.name} ${JSON.stringify(m.arguments)}`);
+              console.log("### END TOOL CALL ###");
               break;
           }
         }
