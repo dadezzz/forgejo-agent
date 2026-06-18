@@ -18,7 +18,7 @@ jobs:
           mkdir -p $HOME/.pi/agent/
           echo '{"providers":{"llama-server":{"baseUrl":"http://llama.zarantonello.dev/v1","api":"openai-completions","apiKey":"llama","models":[{"id":"Qwen3.6-35B-A3B","contextWindow":65536}]}}}' > $HOME/.pi/agent/models.json
       - name: Generate response
-        uses: https://git.zarantonello.dev/infra/forgejo-agent@122c8b70043d20a6f73938508ee16dfd7f79109d # v1.1.0
+        uses: https://git.zarantonello.dev/infra/forgejo-agent@8aef7094e9c6c56049c6f15f3f6e274067daca1e # v1.1.2
         with:
           auth-token: ${{ secrets.AGENT_TOKEN }}
           auth-username: llm-bot
