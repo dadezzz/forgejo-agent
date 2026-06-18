@@ -5,28 +5,26 @@ concurrency:
 jobs:
   build:
     container:
-      image: quay.io/containers/aio:latest@sha256:afb15f614f2ca1002f6e12e26ed9b40a6bc58785ea6940e259f6010927238da5
-    env:
-      IMAGE: git.zarantonello.dev/${{ forge.repository }}
-    name: Build the container
+      image: git.zarantonello.dev/infra/forgejo-agent:ci@sha256:d1463c404d50ac078446d364705009165e2b66729256c8c3c76516d03ba4bd3e
+      volumes:
+        - forgejo-runner-cache-pnpm:/usr/local/pnpm/store
+    name: Build the executable
     runs-on: srv-0-thi-home
     steps:
       - name: Clone the repository
         run: |
           git clone --filter=blob:none --no-checkout https://${{ forge.token }}@git.zarantonello.dev/${{ forge.repository }} ${{ forge.workspace }};
           git checkout --quiet ${{ forge.sha }};
-      - name: Disable fuse-overlayfs
+      - name: Install dependencies with pnpm
+        run: pnpm install
+      - name: Build
+        run: pnpm run build
+      - name: Upload the package
         run: |
-          sed -i 's|mountopt = "nodev,fsync=0"||' /etc/containers/storage.conf;
-          sed -i 's|mount_program = "/usr/bin/fuse-overlayfs"||' /etc/containers/storage.conf;
-      - name: Login to the container registry
-        run: podman login git.zarantonello.dev -u ${{ secrets.REGISTRY_USER }} -p ${{ secrets.REGISTRY_PASSWORD }}
-      - name: Build the container image
-        run: podman build --tag ${{ env.IMAGE }} .
-      - name: Push the container image
-        run: |
-          podman push ${{ env.IMAGE }}
-          podman push ${{ env.IMAGE }} ${{ env.IMAGE }}:${{ forge.ref_name }}
+          curl \
+            -H "Authorization: Bearer ${{ secrets.REGISTRY_PASSWORD }}" \
+            --upload-file dist/forgejo-agent \
+            https://git.zarantonello.dev/api/packages/infra/generic/forgejo-agent/${{ forge.ref_name }}/forgejo-agent
 
 name: build.yaml
 

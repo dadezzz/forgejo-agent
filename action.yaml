@@ -1,21 +1,44 @@
-description: Runs pi agent
+description: Responds to comments mentioning the username of the agent
 
 inputs:
-  issue_number:
-    description: Issue number
+  auth-token:
+    description: Token for authentication
     required: true
-  model:
-    description: Issue number
+  auth-username:
+    description: Username to which the bot responds
     required: true
-  models_json:
-    description: Issue number
+  git-author:
+    description: Author for git commits
     required: true
-  token:
-    description: Token
+  git-email:
+    description: Email for git commits
+    required: true
+  issue-number:
+    description: Issue number in Forgejo API
     required: true
 
 name: forgejo-agent
 
 runs:
-  image: docker://git.zarantonello.dev/infra/forgejo-agent:v1.0.4
-  using: docker
+  steps:
+    - env:
+        VERSION: v1.0.2
+      name: Fetch the forgejo-agent binary
+      run: |
+        CACHE="/cache/forgejo-agent/$VERSION/forgejo-agent"
+
+        if [ -f "$CACHE" ]; then
+          echo "Cache Hit! Copying from tool cache..."
+        else
+          echo "Cache Miss! Downloading..."
+          mkdir -p "/cache/forgejo-agent/$VERSION/"
+          curl -o "$CACHE" "https://git.zarantonello.dev/api/packages/infra/generic/forgejo-agent/$VERSION/forgejo-agent"
+        fi
+
+        cp "$CACHE" ./forgejo-agent
+        chmod +x forgejo-agent
+      shell: sh
+    - name: Run forgejo-agent
+      run: ./forgejo-agent
+      shell: sh
+  using: composite

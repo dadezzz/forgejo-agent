@@ -5,7 +5,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "sed -i 's|git.zarantonello.dev/infra/forgejo-agent:.*|git.zarantonello.dev/infra/forgejo-agent:${nextRelease.gitTag}|' action.yaml"
+        "prepareCmd": "sed -i 's|VERSION: .*|VERSION: ${nextRelease.gitTag}|' action.yaml"
       }
     ],
     [

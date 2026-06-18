@@ -2,6 +2,10 @@ jobs:
   respond:
     container:
       image: git.zarantonello.dev/infra/forgejo-agent:ci@sha256:d1463c404d50ac078446d364705009165e2b66729256c8c3c76516d03ba4bd3e
+      # The composite action in action.yaml can save the binary to speed up
+      # subsequent runs.
+      volumes:
+        - forgejo-runner-cache-forgejo-agent:/cache/forgejo-agent
     name: LLM Bot response generation
     runs-on: srv-0-thi-home
     steps:
@@ -9,16 +13,23 @@ jobs:
         run: |
           git clone --filter=blob:none --no-checkout https://${{ secrets.AGENT_TOKEN }}@git.zarantonello.dev/${{ forge.repository }} ${{ forge.workspace }};
           git checkout --quiet ${{ forge.sha }};
+      - name: Configure pi
+        run: |
+          mkdir -p $HOME/.pi/agent/
+          echo '{"providers":{"llama-server":{"baseUrl":"http://llama.zarantonello.dev/v1","api":"openai-completions","apiKey":"llama","models":[{"id":"Qwen3.6-35B-A3B","contextWindow":65536}]}}}' > $HOME/.pi/agent/models.json
       - name: Generate response
         uses: https://git.zarantonello.dev/infra/forgejo-agent@656ee5c2cac94a2f2b1d011b7f496761d72337e0 # v1.0.4
         with:
-          issue_number: ${{ forge.event.issue.number }}
-          model: Qwen3.6-35B-A3B
-          models_json: |
-            {"providers":{"llama-server":{"baseUrl":"http://llama.zarantonello.dev/v1","api":"openai-completions","apiKey":"llama","models":[{"id":"Qwen3.6-35B-A3B","contextWindow":65536}]}}}
-          token: ${{ secrets.AGENT_TOKEN }}
+          auth-token: ${{ secrets.AGENT_TOKEN }}
+          auth-username: llm-bot
+          git-author: LLM [bot]
+          git-email: llm-bot@zarantonello.dev
+          issue-number: ${{ forge.event.issue.number }}
 
 "on":
   issue_comment:
     types:
       - created
+  issues:
+    types:
+      - opened

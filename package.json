@@ -3,7 +3,7 @@
   "type": "module",
   "main": "dist/main.js",
   "scripts": {
-    "build": "rolldown -c",
+    "build": "rolldown -c && node --build-sea sea.json",
     "check": "tsc",
     "format:check": "biome format",
     "format:fix": "biome format --fix",
