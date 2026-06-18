@@ -29,5 +29,5 @@ export const eventLocation: "issue" | "pull request" = (() => {
 
 export const issueNumber = Number.parseInt(Value.Parse(issueNumberSchema, process.env.CTX_ISSUE_NUMBER), 10);
 
-export const authToken = Value.Parse(authTokenSchema, process.env.INPUT_AUTH_TOKEN);
-export const authUsername = Value.Parse(authUsernameSchema, process.env.INPUT_AUTH_USERNAME);
+export const authToken = Value.Parse(authTokenSchema, process.env.CTX_AUTH_TOKEN);
+export const authUsername = Value.Parse(authUsernameSchema, process.env.CTX_AUTH_USERNAME);

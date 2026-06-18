@@ -44,8 +44,12 @@ runs:
       run: |
         export CTX_EVENT_NAME="${{ forge.event_name }}_${{ forge.event.action }}"
         export CTX_ISSUE_NUMBER="${{ forge.event.issue.number }}"
+        export CTX_AUTH_TOKEN="${{ inputs.auth-token }}"
+        export CTX_AUTH_USERNAME="${{ inputs.auth-username }}"
 
-        echo '${{ toJson(forge.event) }}'
+        # Set author and email if the bot decides to commit its changes.
+        git config --global user.name "${{ inputs.git-author }}"
+        git config --global user.email "${{ inputs.git-email }}"
 
         ./forgejo-agent
       shell: sh
