@@ -1,6 +1,6 @@
 FROM docker.io/library/node:26.3.0-alpine@sha256:9c0e1e52125d6b67d505cf75b4880fcf1290ccea5c480849910e1d57b2cf72b5
 
-RUN apk add --no-cache git
+RUN apk add --no-cache curl git
 
 # renovate: datasource=npm depName=pnpm versioning=npm
 ENV PNPM_VERSION="11.6.0"
