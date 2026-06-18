@@ -2,9 +2,10 @@ import process from "node:process";
 import { createAgentSession, SessionManager } from "@earendil-works/pi-coding-agent";
 import * as context from "./context.ts";
 import { getIssue, getIssueComments, postIssueComment } from "./forgejo.ts";
+import * as tools from "./tools.ts";
 
-const issue = await getIssue(context.issueNumber);
-const issueComments = await getIssueComments(context.issueNumber);
+const issue = await getIssue(context.repository, context.issueNumber);
+const issueComments = await getIssueComments(context.repository, context.issueNumber);
 
 const lastCommentBody = issueComments.length > 0 ? issueComments[issueComments.length - 1].body : issue.body;
 if (!lastCommentBody.includes(`@${context.authUsername}`)) {
@@ -13,10 +14,15 @@ if (!lastCommentBody.includes(`@${context.authUsername}`)) {
 }
 
 const prompt = `\
-You are a coding assistant operating inside a Forgejo issue or pull
-request. You respond to the last comment in the history.
+You are a coding assistant operating inside a Forgejo issue or pull request. You
+respond to the last comment in the history and your response will be posted as a
+comment in the issue.
 
-Your Forgejo username is ${context.authUsername}.
+Context:
+
+- Your Forgejo username is ${context.authUsername}
+- The repository is ${context.repository}
+- The current issue number is ${context.issueNumber}
 
 ---
 
@@ -38,6 +44,7 @@ ${c.body}
 
 const { session } = await createAgentSession({
   sessionManager: SessionManager.inMemory(),
+  customTools: [tools.createIssue, tools.closeIssue],
 });
 
 let messageStr = "";
@@ -73,4 +80,4 @@ session.subscribe((l) => {
 });
 
 await session.prompt(prompt);
-await postIssueComment(context.issueNumber, messageStr);
+await postIssueComment(context.repository, context.issueNumber, { body: messageStr });

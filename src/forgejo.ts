@@ -27,24 +27,40 @@ async function forgejoFetch<const S extends TSchema>(
   return Value.Parse(responseSchema, responseBody);
 }
 
-export async function getIssue(issueNumber: number) {
-  return await forgejoFetch("GET", `/repos/${context.repository}/issues/${issueNumber}`, null, issueSchema);
+export async function getIssue(repository: string, issueNumber: number) {
+  return await forgejoFetch("GET", `/repos/${repository}/issues/${issueNumber}`, null, issueSchema);
 }
 
-export async function getIssueComments(issueNumber: number) {
+export async function patchIssue(
+  repository: string,
+  issueNumber: number,
+  patch: Partial<StaticParse<typeof issueSchema>>,
+) {
+  return await forgejoFetch("PATCH", `/repos/${repository}/issues/${issueNumber}`, JSON.stringify(patch), issueSchema);
+}
+
+export async function postIssue(repository: string, body: Partial<StaticParse<typeof issueSchema>>) {
+  return await forgejoFetch("POST", `/repos/${repository}/issues`, JSON.stringify(body), issueSchema);
+}
+
+export async function getIssueComments(repository: string, issueNumber: number) {
   return await forgejoFetch(
     "GET",
-    `/repos/${context.repository}/issues/${issueNumber}/comments`,
+    `/repos/${repository}/issues/${issueNumber}/comments`,
     null,
     Type.Array(issueCommentSchema),
   );
 }
 
-export async function postIssueComment(issueNumber: number, body: string) {
+export async function postIssueComment(
+  repository: string,
+  issueNumber: number,
+  body: Partial<StaticParse<typeof issueCommentSchema>>,
+) {
   return await forgejoFetch(
     "POST",
-    `/repos/${context.repository}/issues/${issueNumber}/comments`,
-    JSON.stringify({ body }),
+    `/repos/${repository}/issues/${issueNumber}/comments`,
+    JSON.stringify(body),
     issueCommentSchema,
   );
 }
