@@ -1,46 +1,8 @@
-import process from "node:process";
 import { createAgentSession, SessionManager } from "@earendil-works/pi-coding-agent";
 import * as context from "./context.ts";
-import { getIssue, getIssueComments, postIssueComment } from "./forgejo.ts";
+import { postIssueComment } from "./forgejo.ts";
 import * as tools from "./tools.ts";
-
-const issue = await getIssue(context.repository, context.issueNumber);
-const issueComments = await getIssueComments(context.repository, context.issueNumber);
-
-const lastCommentBody = issueComments.length > 0 ? issueComments[issueComments.length - 1].body : issue.body;
-if (!lastCommentBody.includes(`@${context.authUsername}`)) {
-  console.log(`@${context.authUsername} not mentioned, exiting`);
-  process.exit(0);
-}
-
-const prompt = `\
-You are a coding assistant operating inside a Forgejo issue or pull request. You
-respond to the last comment in the history and your response will be posted as a
-comment in the issue.
-
-Context:
-
-- Your Forgejo username is ${context.authUsername}
-- The repository is ${context.repository}
-- The current issue number is ${context.issueNumber}
-
----
-
-Comments history:
-
-### START ISSUE FROM: ${issue.user.username} ###
-${issue.title}
-
-${issue.body}
-### END ISSUE ###
-${issueComments
-  .map(
-    (c) => `\
-### START ISSUE COMMENT FROM: ${c.user.username} ###
-${c.body}
-### END ISSUE COMMENT ###`,
-  )
-  .join("\n")}`;
+import { buildPrompt } from "./prompt.ts";
 
 const { session } = await createAgentSession({
   sessionManager: SessionManager.inMemory(),
@@ -79,5 +41,5 @@ session.subscribe((l) => {
     }
 });
 
-await session.prompt(prompt);
+await session.prompt(await buildPrompt());
 await postIssueComment(context.repository, context.issueNumber, { body: messageStr });

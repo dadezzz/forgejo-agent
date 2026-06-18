@@ -29,6 +29,8 @@ jobs:
           git-author: LLM [bot]
           git-email: llm-bot@zarantonello.dev
 
+name: llm-bot
+
 "on":
   issue_comment:
     types:
