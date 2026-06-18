@@ -34,12 +34,12 @@ export async function getIssue(repository: string, issueNumber: number) {
 export async function patchIssue(
   repository: string,
   issueNumber: number,
-  patch: Partial<StaticParse<typeof issueSchema>>,
+  patch: { body?: string; title?: string; state?: "open" | "closed" },
 ) {
   return await forgejoFetch("PATCH", `/repos/${repository}/issues/${issueNumber}`, JSON.stringify(patch), issueSchema);
 }
 
-export async function postIssue(repository: string, body: Partial<StaticParse<typeof issueSchema>>) {
+export async function postIssue(repository: string, body: { body: string; title: string }) {
   return await forgejoFetch("POST", `/repos/${repository}/issues`, JSON.stringify(body), issueSchema);
 }
 
@@ -52,11 +52,7 @@ export async function getIssueComments(repository: string, issueNumber: number) 
   );
 }
 
-export async function postIssueComment(
-  repository: string,
-  issueNumber: number,
-  body: Partial<StaticParse<typeof issueCommentSchema>>,
-) {
+export async function postIssueComment(repository: string, issueNumber: number, body: { body: string }) {
   return await forgejoFetch(
     "POST",
     `/repos/${repository}/issues/${issueNumber}/comments`,

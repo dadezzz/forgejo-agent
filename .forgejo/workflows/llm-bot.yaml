@@ -12,7 +12,11 @@ jobs:
       - name: Clone the repository
         run: |
           git clone --filter=blob:none --no-checkout https://${{ secrets.AGENT_TOKEN }}@git.zarantonello.dev/${{ forge.repository }} ${{ forge.workspace }};
-          git checkout --quiet ${{ forge.sha }};
+          if [ -n "${{ forge.event.pull_request.head.sha }}" ]; then
+            git checkout --quiet ${{ forge.event.pull_request.head.sha }};
+          else
+            git checkout --quiet ${{ forge.sha }};
+          fi
       - name: Configure pi
         run: |
           mkdir -p $HOME/.pi/agent/
@@ -24,7 +28,6 @@ jobs:
           auth-username: llm-bot
           git-author: LLM [bot]
           git-email: llm-bot@zarantonello.dev
-          issue-number: ${{ forge.event.issue.number }}
 
 "on":
   issue_comment:
@@ -33,3 +36,7 @@ jobs:
   issues:
     types:
       - opened
+  pull_request:
+    types:
+      - opened
+      - review_requested

@@ -13,9 +13,6 @@ inputs:
   git-email:
     description: Email for git commits
     required: true
-  issue-number:
-    description: Issue number in Forgejo API
-    required: true
 
 name: forgejo-agent
 
@@ -38,7 +35,16 @@ runs:
         cp "$CACHE" ./forgejo-agent
         chmod +x forgejo-agent
       shell: sh
+      # Valid events are:
+      # - issue_opened
+      # - issue_comment_created
+      # - pull_request_opened
+      # - pull_request_review_requested
     - name: Run forgejo-agent
-      run: ./forgejo-agent
+      run: |
+        export CTX_EVENT_NAME="${{ forge.event_name }}_${{ forge.event.action }}"
+        export CTX_ISSUE_NUMBER="${{ forge.event.issue.number }}"
+
+        ./forgejo-agent
       shell: sh
   using: composite

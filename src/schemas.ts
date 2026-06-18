@@ -1,9 +1,8 @@
 import Type from "typebox";
 
-export const apiUrlSchema = Type.String();
+export const apiUrlSchema = Type.String({ pattern: /https?:\/\/.+/ });
 
 export const authTokenSchema = Type.String();
-
 export const authUsernameSchema = Type.String();
 
 export const repositorySchema = Type.String({
