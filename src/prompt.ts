@@ -6,14 +6,12 @@ export async function buildPrompt(): Promise<string> {
   const issue = await getIssue(context.repository, context.issueNumber);
   const issueComments = await getIssueComments(context.repository, context.issueNumber);
 
-  let prompt = `\
-    You are operating in the context of a Forgejo ${context.eventLocation} in the repository ${context.repository}.
-  `;
+  let prompt = `You are operating in the context of a Forgejo ${context.eventLocation} in the repository ${context.repository}.`;
 
   let instructions = [
     `- Your Forgejo username is ${context.authUsername}`,
     `- The ${context.eventLocation} number is ${context.issueNumber}`,
-    `- Whatever you write, it will be posted as comment in the ${context.eventLocation}`,
+    `- Whatever the user asks you, you should respond with a comment in the ${context.eventLocation}`,
   ];
 
   const prInstructions = [
@@ -54,24 +52,20 @@ export async function buildPrompt(): Promise<string> {
       throw new Error(`unsupported event name: ${context.eventName}`);
   }
 
-  prompt += `
-    ${instructions.join("\n")}
-  `;
+  prompt += `\n${instructions.join("\n")}\n\n`;
 
-  prompt += `
-    ---
-
-    Content of ${context.eventLocation.toUpperCase()} from user ${issue.user.username}:
-
-    # ${issue.title}
-
-    ${issue.body}
-  `;
+  prompt += `---\n\n### start ${context.eventLocation} content from user ${issue.user.username} ###\n# ${issue.title}\n`;
+  if (issue.body) {
+    prompt += `\n${issue.body}\n`;
+  }
+  prompt += `### end ${context.eventLocation} content ###\n`;
 
   if (issueComments.length > 0) {
-    prompt += `
-      ${issueComments.map((c) => `Comment from ${c.user.username}:\n\n${c.body}\n`).join("\n")}
-    `;
+    for (const c of issueComments) {
+      prompt += `### start comment from ${c.user.username} ###\n`;
+      prompt += `${c.body}\n`;
+      prompt += `### end comment ###\n`;
+    }
   }
 
   console.log("### START PROMPT ###");

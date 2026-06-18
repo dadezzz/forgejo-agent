@@ -17,12 +17,12 @@ session.subscribe((l) => {
         for (const m of l.message.content) {
           switch (m.type) {
             case "text":
-              console.log(m.text);
+              console.log(m.text.trim());
               messageStr += m.text;
               break;
             case "thinking":
               console.log("### START THINKING ###");
-              console.log(m.thinking);
+              console.log(m.thinking.trim());
               console.log("### END THINKING ###");
               break;
             case "toolCall":
@@ -34,14 +34,7 @@ session.subscribe((l) => {
         }
 
         break;
-      case "toolResult":
-        if (l.message.isError) {
-          console.log(`tool call failed for ${l.message.toolName}: ${JSON.stringify(l.message.content)}`);
-        }
-
-        break;
     }
 });
 
 await session.prompt(await buildPrompt());
-await postIssueComment(context.repository, context.issueNumber, { body: messageStr });
