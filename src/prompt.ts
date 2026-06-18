@@ -6,12 +6,12 @@ export async function buildPrompt(): Promise<string> {
   const issue = await getIssue(context.repository, context.issueNumber);
   const issueComments = await getIssueComments(context.repository, context.issueNumber);
 
-  let prompt = `You are operating in the context of a Forgejo ${context.eventLocation} in the repository ${context.repository}.`;
+  let prompt = `You are operating in the context of a Forgejo ${context.eventLocation} in the repository ${context.repository}.\n`;
 
   let instructions = [
     `- Your Forgejo username is ${context.authUsername}`,
     `- The ${context.eventLocation} number is ${context.issueNumber}`,
-    `- Whatever the user asks you, you should respond with a comment in the ${context.eventLocation}`,
+    `- Whatever the user asks you, you should respond with a comment in the ${context.eventLocation} using the create-issue-comment tool`,
   ];
 
   const prInstructions = [
