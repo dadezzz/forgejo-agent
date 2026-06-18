@@ -44,6 +44,7 @@ runs:
       run: |
         export CTX_EVENT_NAME="${{ forge.event_name }}_${{ forge.event.action }}"
         export CTX_ISSUE_NUMBER="${{ forge.event.issue.number }}"
+        echo ${{ toJson(forge.event) }}
 
         ./forgejo-agent
       shell: sh
