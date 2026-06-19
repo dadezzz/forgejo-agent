@@ -50,7 +50,7 @@ export const createIssueComment = defineTool({
 export const createPullRequest = defineTool({
   label: "create-pull-request",
   name: "create-pull-request",
-  description: "Creates a pull request in a Forgejo repository.",
+  description: "Creates a pull request in a Forgejo repository. Doesn't handle git operations",
   parameters: Type.Object({
     repository: schemas.repositorySchema,
     title: Type.String({ description: "Title of the pull request" }),

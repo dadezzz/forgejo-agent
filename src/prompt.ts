@@ -11,16 +11,19 @@ export async function buildPrompt(): Promise<string> {
     `- Your Forgejo username is ${context.authUsername}`,
     `- The ${context.eventLocation} number is ${context.issueNumber}`,
     `- You should respond with a comment in the ${context.eventLocation} using the create-issue-comment tool`,
+    "- You are on a detached HEAD state, if you commit code you must create a new branch with `git switch -c`",
+    "- You can simply use `git push` since the remote branch is created automatically",
+    "- All git operations must be performed using the `bash` tool",
   ];
 
   const prInstructions = [
-    `- You are on a pull request branch (${context.headRef}) that will merge into ${context.baseRef}`,
-    "- You can make changes to the code, but you must commit and push them to the current branch or they will be lost. You can perform git operations using the bash tool",
+    `- The code you are seeing is from the upstream pull request branch ${context.headRef} that will merge into ${context.baseRef}`,
+    "- You can make changes to the code, but you must commit and push them to the upstream branch or they will be lost.",
   ];
 
   const issueInstructions = [
-    `- You are on the default protected branch: ${context.refName}`,
-    "- You can make changes to the code, but you must commit and push them in a new pull request (you have the create-pull-request tool) or they will be lost. You can perform git operations using the bash tool",
+    `- The code you are seeing is from the upstream default branch: ${context.refName}`,
+    "- You can make changes to the code but need to push them in a new pull request (you have the create-pull-request tool) or they will be lost.",
   ];
 
   const prReviewInstructions = [

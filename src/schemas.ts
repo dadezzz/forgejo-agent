@@ -37,7 +37,7 @@ export const issueCommentSchema = Type.Object({
     username: Type.String(),
   }),
   body: Type.String(),
-  id: Type.String(),
+  id: Type.Number(),
 });
 
 export const pullRequestSchema = issueSchema;

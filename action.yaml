@@ -76,6 +76,8 @@ runs:
         # Set author and email if the bot decides to commit its changes.
         git config --global user.name "${{ inputs.git-author }}"
         git config --global user.email "${{ inputs.git-email }}"
+        # The agent can simply use git push, without having to set upstream.
+        git config --global push.autoSetupRemote true
 
         ./forgejo-agent
       shell: sh
