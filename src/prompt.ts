@@ -5,22 +5,22 @@ export async function buildPrompt(): Promise<string> {
   const issue = await getIssue(context.repository, context.issueNumber);
   const issueComments = await getIssueComments(context.repository, context.issueNumber);
 
-  let prompt = `You are operating in the context of a Forgejo ${context.eventLocation} in the repository ${context.repository}.\n`;
+  let prompt = `You are operating in the context of a Forgejo ${context.eventLocation} in the repository ${context.repository}.`;
 
   let instructions = [
     `- Your Forgejo username is ${context.authUsername}`,
     `- The ${context.eventLocation} number is ${context.issueNumber}`,
-    `- Whatever the user asks you, you should respond with a comment in the ${context.eventLocation} using the create-issue-comment tool`,
+    `- You should respond with a comment in the ${context.eventLocation} using the create-issue-comment tool`,
   ];
 
   const prInstructions = [
     `- You are on a pull request branch (${context.headRef}) that will merge into ${context.baseRef}`,
-    "- You can make changes to the code, but you must commit and push them to the current branch or they will be lost",
+    "- You can make changes to the code, but you must commit and push them to the current branch or they will be lost. You can perform git operations using the bash tool",
   ];
 
   const issueInstructions = [
     `- You are on the default protected branch: ${context.refName}`,
-    "- You can make changes to the code, but you must commit and push them in a new pull request (you have the create-pull-request tool) or they will be lost",
+    "- You can make changes to the code, but you must commit and push them in a new pull request (you have the create-pull-request tool) or they will be lost. You can perform git operations using the bash tool",
   ];
 
   const prReviewInstructions = [
@@ -49,19 +49,19 @@ export async function buildPrompt(): Promise<string> {
       throw new Error(`unsupported event name: ${context.eventName}`);
   }
 
-  prompt += `\n${instructions.join("\n")}\n\n`;
+  prompt += `\n\n${instructions.join("\n")}`;
 
-  prompt += `---\n\n### start ${context.eventLocation} content from user ${issue.user.username} ###\n# ${issue.title}\n`;
+  prompt += `\n\n---\n\n### start ${context.eventLocation} content from user ${issue.user.username} ###\n# ${issue.title}`;
   if (issue.body) {
-    prompt += `\n${issue.body}\n`;
+    prompt += `\n\n${issue.body}`;
   }
-  prompt += `### end ${context.eventLocation} content ###\n`;
+  prompt += `\n### end ${context.eventLocation} content ###`;
 
   if (issueComments.length > 0) {
     for (const c of issueComments) {
-      prompt += `### start comment from ${c.user.username} ###\n`;
-      prompt += `${c.body}\n`;
-      prompt += `### end comment ###\n`;
+      prompt += `\n### start comment from ${c.user.username} ###`;
+      prompt += `\n${c.body}`;
+      prompt += `\n### end comment ###`;
     }
   }
 
