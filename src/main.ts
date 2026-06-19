@@ -1,15 +1,12 @@
 import { createAgentSession, SessionManager } from "@earendil-works/pi-coding-agent";
-import * as context from "./context.ts";
-import { postIssueComment } from "./forgejo.ts";
 import * as tools from "./tools.ts";
 import { buildPrompt } from "./prompt.ts";
 
 const { session } = await createAgentSession({
   sessionManager: SessionManager.inMemory(),
-  customTools: [tools.createIssue, tools.closeIssue],
+  customTools: [tools.createIssue, tools.closeIssue, tools.createIssueComment, tools.createPullRequest],
 });
 
-let messageStr = "";
 session.subscribe((l) => {
   if (l.type === "message_end")
     switch (l.message.role) {
@@ -18,7 +15,6 @@ session.subscribe((l) => {
           switch (m.type) {
             case "text":
               console.log(m.text.trim());
-              messageStr += m.text;
               break;
             case "thinking":
               console.log("### START THINKING ###");

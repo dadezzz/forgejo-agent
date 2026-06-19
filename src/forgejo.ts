@@ -1,7 +1,7 @@
 import Type, { type StaticParse, type TSchema } from "typebox";
 import Value from "typebox/value";
 import * as context from "./context.ts";
-import { issueCommentSchema, issueSchema } from "./schemas.ts";
+import { issueCommentSchema, issueSchema, pullRequestSchema } from "./schemas.ts";
 
 async function forgejoFetch<const S extends TSchema>(
   method: string,
@@ -59,4 +59,11 @@ export async function postIssueComment(repository: string, issueNumber: number, 
     JSON.stringify(body),
     issueCommentSchema,
   );
+}
+
+export async function postPullRequest(
+  repository: string,
+  body: { title: string; body: string; head: string; base: string },
+) {
+  return await forgejoFetch("POST", `/repos/${repository}/pulls`, JSON.stringify(body), pullRequestSchema);
 }

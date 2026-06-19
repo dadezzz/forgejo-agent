@@ -10,6 +10,8 @@ jobs:
     runs-on: srv-0-thi-home
     steps:
       - name: Clone the repository
+        # Checkout the pull request branch if we are inside one, so that the
+        # agent can operate on and review the proposed code.
         run: |
           git clone --filter=blob:none --no-checkout https://${{ secrets.AGENT_TOKEN }}@git.zarantonello.dev/${{ forge.repository }} ${{ forge.workspace }};
           if [ -n "${{ forge.event.pull_request.head.sha }}" ]; then

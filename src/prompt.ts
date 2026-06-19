@@ -1,6 +1,5 @@
 import { getIssue, getIssueComments } from "./forgejo.ts";
 import * as context from "./context.ts";
-import process from "node:process";
 
 export async function buildPrompt(): Promise<string> {
   const issue = await getIssue(context.repository, context.issueNumber);
@@ -16,18 +15,16 @@ export async function buildPrompt(): Promise<string> {
 
   const prInstructions = [
     `- You are on a pull request branch (${context.headRef}) that will merge into ${context.baseRef}`,
-    "- You can make changes to the code, but you must commit and push them or they will be lost",
+    "- You can make changes to the code, but you must commit and push them to the current branch or they will be lost",
   ];
 
   const issueInstructions = [
-    `- You are on the default branch: ${context.refName}`,
-    "- You cannot make changes to the code",
+    `- You are on the default protected branch: ${context.refName}`,
+    "- You can make changes to the code, but you must commit and push them in a new pull request (you have the create-pull-request tool) or they will be lost",
   ];
 
   const prReviewInstructions = [
-    `- You are on a pull request branch (${context.headRef}) that will merge into ${context.baseRef}`,
     "- You have been assigned as a reviewer of the pull request. Report any findings with the 'submit-review' tool.",
-    "- You cannot make changes to the code",
   ];
 
   switch (context.eventName) {
@@ -46,7 +43,7 @@ export async function buildPrompt(): Promise<string> {
 
       break;
     case "pull_request_review_requested":
-      instructions = instructions.concat(prReviewInstructions);
+      instructions = instructions.concat(prInstructions).concat(prReviewInstructions);
       break;
     default:
       throw new Error(`unsupported event name: ${context.eventName}`);

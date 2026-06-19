@@ -2,13 +2,20 @@ import Type from "typebox";
 
 export const apiUrlSchema = Type.String({ pattern: /https?:\/\/.+/ });
 
-export const authTokenSchema = Type.String();
-export const authUsernameSchema = Type.String();
+export const authTokenSchema = Type.String({ minLength: 1 });
+export const authUsernameSchema = Type.String({ minLength: 1 });
 
 export const repositorySchema = Type.String({
   pattern: /.+\/.+/,
   description: "Repository reference in owner/name format",
 });
+
+export const eventNameSchema = Type.Union([
+  Type.Literal("issue_comment_created"),
+  Type.Literal("issues_opened"),
+  Type.Literal("pull_request_opened"),
+  Type.Literal("pull_request_review_requested"),
+]);
 
 export const issueNumberSchema = Type.String({
   pattern: /[0-9]+/,
@@ -22,7 +29,7 @@ export const issueSchema = Type.Object({
   }),
   title: Type.String(),
   body: Type.String(),
-  state: Type.String({ pattern: /open|closed/ }),
+  state: Type.Union([Type.Literal("open"), Type.Literal("closed")]),
 });
 
 export const issueCommentSchema = Type.Object({
@@ -30,4 +37,11 @@ export const issueCommentSchema = Type.Object({
     username: Type.String(),
   }),
   body: Type.String(),
+  id: Type.String(),
+});
+
+export const pullRequestSchema = issueSchema;
+
+export const postReviewRequestSchema = Type.Object({
+  number: Type.Number(),
 });
