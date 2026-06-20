@@ -28,9 +28,9 @@ export async function getEventContext() {
   }
 
   const event = {
+    ...(pullRequest ? { type: "pull request" as const, ...pullRequest } : { type: "issue" as const, ...issue }),
     name: Value.Parse(eventNameSchema, process.env.CTX_EVENT_NAME),
     comments: await getIssueComments(repositoryName, issueNumber),
-    ...(pullRequest ? { type: "pull request" as const, ...pullRequest } : { type: "issue" as const, ...issue }),
   };
 
   return {

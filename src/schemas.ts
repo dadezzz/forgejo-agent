@@ -25,11 +25,13 @@ export const issueNumberSchema = Type.String({
   description: "Number assigned to the Forgejo issue",
 });
 
+const issueUserSchema = Type.Object({
+  username: Type.String(),
+});
+
 export const issueSchema = Type.Object({
   number: Type.Number(),
-  user: Type.Object({
-    username: Type.String(),
-  }),
+  user: issueUserSchema,
   title: Type.String(),
   body: Type.String(),
   state: Type.Union([Type.Literal("open"), Type.Literal("closed")]),
@@ -37,9 +39,7 @@ export const issueSchema = Type.Object({
 });
 
 export const issueCommentSchema = Type.Object({
-  user: Type.Object({
-    username: Type.String(),
-  }),
+  user: issueUserSchema,
   body: Type.String(),
   id: Type.Number(),
 });
@@ -50,9 +50,7 @@ const branchSchema = Type.Object({
 
 export const pullRequestSchema = Type.Object({
   number: Type.Number(),
-  user: Type.Object({
-    username: Type.String(),
-  }),
+  user: issueUserSchema,
   title: Type.String(),
   body: Type.String(),
   state: Type.Union([Type.Literal("open"), Type.Literal("closed")]),
