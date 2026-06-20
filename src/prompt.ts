@@ -6,14 +6,15 @@ export async function buildPrompt(
 ): Promise<string> {
   let prompt = `You are the ${authCtx.username} user operating in the context of Forgejo ${eventCtx.event.type} number ${eventCtx.event.number} in the repository ${eventCtx.repository.full_name}.`;
 
-  prompt += "\n\nThe git repository is in detached HEAD state. You can perform git operations using the `bash` tool.";
-  prompt +=
-    "\nIf you commit code you must create a new branch with `git switch -c` and then upload it with `git push`; the upstream branch is created automatically.";
+  prompt += `\n\nYou can perform git operations using the \`bash\` tool.`;
+  prompt += `\nIf you commit code you can upload it with \`git push\`; the upstream branch is created automatically.`;
 
   if (eventCtx.event.type === "pull request") {
-    prompt += `\n\nThe code you are seeing is from the upstream pull request branch ${eventCtx.event.head.label} that will merge into ${eventCtx.event.base.label}. You can make changes, but must commit and push them upstream or they will be lost.`;
+    prompt += `\nThe code you are seeing is from the upstream branch ${eventCtx.event.head.label} that will merge into ${eventCtx.event.base.label}.`;
+    prompt += "\nYou can make changes, but must commit and push them upstream or they will be lost.";
   } else {
-    prompt += `\n\nThe code you are seeing is from the upstream default branch: ${eventCtx.repository.default_branch}. You can make changes, but must commit and push them in a new pull request (you have the create-pull-request tool) or they will be lost.`;
+    prompt += `\nThe code you are seeing is from the upstream default branch: ${eventCtx.repository.default_branch}.`;
+    prompt += `\nYou can make changes, but must commit and push them in a new branch and create a pull request (\`create-pull-request\` tool) or they will be lost.`;
   }
 
   if (eventCtx.event.name === "pull_request_review_requested") {
@@ -32,8 +33,5 @@ export async function buildPrompt(
     prompt += `\n### end comment ###`;
   }
 
-  console.log("### START PROMPT ###");
-  console.log(prompt);
-  console.log(`### END PROMPT ###`);
   return prompt;
 }

@@ -45,4 +45,8 @@ session.subscribe((l) => {
 });
 
 const prompt = await buildPrompt(authCtx, eventCtx);
+console.log("### START PROMPT ###");
+console.log(prompt);
+console.log(`### END PROMPT ###`);
+
 await session.prompt(prompt);
