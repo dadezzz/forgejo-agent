@@ -19,9 +19,9 @@ jobs:
           auth-token: ${{ secrets.AGENT_TOKEN }}
           auth-username: llm-bot
           git-author: LLM [bot]
-          git-email: llm-bot@zarantonello.dev
+          git-email: llm-bot@git.zarantonello.dev
 
-name: llm-bot
+name: forgejo-agent
 
 "on":
   issue_comment:

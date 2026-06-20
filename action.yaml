@@ -49,21 +49,21 @@ runs:
             ;;
           pull_request_opened)
             export CTX_ISSUE_NUMBER="${{ forge.event.pull_request.number }}"
-            if ! echo "${{ forge.event.pull_request.body }}" | grep -q "${{ inputs.auth-username }}"; then
+            if [ ! "${{ contains(forge.event.pull_request.body, inputs.auth.username) }}" ]; then
               echo "@${{ inputs.auth-username }} was not requested for review"
               exit 0
             fi
             ;;
           issue_comment_created)
             export CTX_ISSUE_NUMBER="${{ forge.event.issue.number }}"
-            if ! echo "${{ forge.event.comment.body }}" | grep -q "${{ inputs.auth-username }}"; then
+            if [ ! "${{ contains(forge.event.comment.body, inputs.auth.username) }}" ]; then
               echo "@${{ inputs.auth-username }} was not requested for review"
               exit 0
             fi
             ;;
           issues_opened)
             export CTX_ISSUE_NUMBER="${{ forge.event.issue.number }}"
-            if ! echo "${{ forge.event.issue.body }}" | grep -q "${{ inputs.auth-username }}"; then
+            if [ ! "${{ contains(forge.event.issue.body, inputs.auth.username) }}" ]; then
               echo "@${{ inputs.auth-username }} was not requested for review"
               exit 0
             fi
