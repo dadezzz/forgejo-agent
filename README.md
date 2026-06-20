@@ -27,7 +27,7 @@ custom Forgejo API tools.
 Add this action to your Forgejo workflow:
 
 ```yaml
-- uses: infra/forgejo-agent@v1
+- uses: infra/ci-forgejo-agent@v1
   with:
     # Create a token for the llm-bot user with repository:write and issue:write
     # permissions.
