@@ -9,7 +9,7 @@ jobs:
       volumes:
         - forgejo-runner-cache-pnpm:/usr/local/pnpm/store
     name: Checks with static tools
-    runs-on: srv-0-thi-home
+    runs-on: srv-0-nbg-hetz
     steps:
       - name: Clone the repository
         run: |

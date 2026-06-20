@@ -1,6 +1,6 @@
 import { defineTool } from "@earendil-works/pi-coding-agent";
 import Type from "typebox";
-import { patchIssue, postIssue, postIssueComment, postPullRequest } from "./forgejo.ts";
+import { patchIssue, postIssue, postIssueComment, postPullRequest } from "./forgejo/index.ts";
 import * as schemas from "./schemas.ts";
 
 export const closeIssue = defineTool({
@@ -8,7 +8,7 @@ export const closeIssue = defineTool({
   name: "close-issue",
   description: "Closes an issue in a Forgejo repository.",
   parameters: Type.Object({
-    repository: schemas.repositorySchema,
+    repository: schemas.repositoryFullNameSchema,
     issueNumber: schemas.issueNumberSchema,
   }),
   execute: async (_toolCallId, params) => {
@@ -22,7 +22,7 @@ export const createIssue = defineTool({
   name: "create-issue",
   description: "Creates an issue in a Forgejo repository.",
   parameters: Type.Object({
-    repository: schemas.repositorySchema,
+    repository: schemas.repositoryFullNameSchema,
     title: Type.String({ description: "Title of the issue" }),
     body: Type.String({ description: "Content body of the issue" }),
   }),
@@ -37,7 +37,7 @@ export const createIssueComment = defineTool({
   name: "create-issue-comment",
   description: "Creates a comment in an issue or pull request in a Forgejo repository",
   parameters: Type.Object({
-    repository: schemas.repositorySchema,
+    repository: schemas.repositoryFullNameSchema,
     issueNumber: schemas.issueNumberSchema,
     body: Type.String({ description: "Body of the comment" }),
   }),
@@ -52,7 +52,7 @@ export const createPullRequest = defineTool({
   name: "create-pull-request",
   description: "Creates a pull request in a Forgejo repository. Doesn't handle git operations",
   parameters: Type.Object({
-    repository: schemas.repositorySchema,
+    repository: schemas.repositoryFullNameSchema,
     title: Type.String({ description: "Title of the pull request" }),
     body: Type.String({ description: "Comment body of the pull request" }),
     head: Type.String({ description: "Name of the head branch" }),

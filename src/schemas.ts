@@ -1,13 +1,16 @@
 import Type from "typebox";
 
-export const apiUrlSchema = Type.String({ pattern: /https?:\/\/.+/ });
-
 export const authTokenSchema = Type.String({ minLength: 1 });
 export const authUsernameSchema = Type.String({ minLength: 1 });
 
-export const repositorySchema = Type.String({
+export const repositoryFullNameSchema = Type.String({
   pattern: /.+\/.+/,
   description: "Repository reference in owner/name format",
+});
+
+export const repositorySchema = Type.Object({
+  full_name: repositoryFullNameSchema,
+  default_branch: Type.String(),
 });
 
 export const eventNameSchema = Type.Union([
@@ -30,6 +33,7 @@ export const issueSchema = Type.Object({
   title: Type.String(),
   body: Type.String(),
   state: Type.Union([Type.Literal("open"), Type.Literal("closed")]),
+  pull_request: Type.Union([Type.Object({}), Type.Null()]),
 });
 
 export const issueCommentSchema = Type.Object({
@@ -40,7 +44,21 @@ export const issueCommentSchema = Type.Object({
   id: Type.Number(),
 });
 
-export const pullRequestSchema = issueSchema;
+const branchSchema = Type.Object({
+  label: Type.String(),
+});
+
+export const pullRequestSchema = Type.Object({
+  number: Type.Number(),
+  user: Type.Object({
+    username: Type.String(),
+  }),
+  title: Type.String(),
+  body: Type.String(),
+  state: Type.Union([Type.Literal("open"), Type.Literal("closed")]),
+  head: branchSchema,
+  base: branchSchema,
+});
 
 export const postReviewRequestSchema = Type.Object({
   number: Type.Number(),

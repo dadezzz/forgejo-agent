@@ -1,40 +1,40 @@
 import Value from "typebox/value";
 import {
-  apiUrlSchema,
   authTokenSchema,
   authUsernameSchema,
   eventNameSchema,
   issueNumberSchema,
-  repositorySchema,
+  repositoryFullNameSchema,
 } from "./schemas.ts";
-import Type from "typebox";
 import process from "node:process";
+import { getIssue, getIssueComments, getPullRequest, getRepository } from "./forgejo/index.ts";
 
-export const apiUrl = Value.Parse(apiUrlSchema, process.env.FORGEJO_API_URL);
-export const repository = Value.Parse(repositorySchema, process.env.FORGEJO_REPOSITORY);
+export function getAuthContext() {
+  return {
+    token: Value.Parse(authTokenSchema, process.env.CTX_AUTH_TOKEN),
+    username: Value.Parse(authUsernameSchema, process.env.CTX_AUTH_USERNAME),
+  };
+}
 
-// CTX_EVENT_NAME is defined in action.yaml where we can access forge.event.action.
-export const eventName = Value.Parse(eventNameSchema, process.env.CTX_EVENT_NAME);
+export async function getEventContext() {
+  const repositoryName = Value.Parse(repositoryFullNameSchema, process.env.FORGEJO_REPOSITORY);
+  const issueNumber = Number(Value.Parse(issueNumberSchema, process.env.CTX_ISSUE_NUMBER));
 
-// Head and base refs are defined only in pull requests.
-export const headRef = Value.Parse(Type.Optional(Type.String()), process.env.FORGEJO_HEAD_REF);
-export const baseRef = Value.Parse(Type.Optional(Type.String()), process.env.FORGEJO_BASE_REF);
-export const refName = Value.Parse(Type.String(), process.env.FORGEJO_REF_NAME);
+  const issue = await getIssue(repositoryName, issueNumber);
 
-// Helpful to know if event was triggered from a PR or a issue.
-export const eventLocation: "issue" | "pull request" = (() => {
-  if (
-    eventName === "pull_request_review_requested" ||
-    eventName === "pull_request_opened" ||
-    (eventName === "issue_comment_created" && headRef && baseRef)
-  ) {
-    return "pull request";
+  let pullRequest = null;
+  if (issue.pull_request) {
+    pullRequest = await getPullRequest(repositoryName, issueNumber);
   }
 
-  return "issue";
-})();
+  const event = {
+    name: Value.Parse(eventNameSchema, process.env.CTX_EVENT_NAME),
+    comments: await getIssueComments(repositoryName, issueNumber),
+    ...(pullRequest ? { type: "pull request" as const, ...pullRequest } : { type: "issue" as const, ...issue }),
+  };
 
-export const issueNumber = Number(Value.Parse(issueNumberSchema, process.env.CTX_ISSUE_NUMBER));
-
-export const authToken = Value.Parse(authTokenSchema, process.env.CTX_AUTH_TOKEN);
-export const authUsername = Value.Parse(authUsernameSchema, process.env.CTX_AUTH_USERNAME);
+  return {
+    repository: await getRepository(repositoryName),
+    event,
+  };
+}

@@ -1,6 +1,17 @@
 import { createAgentSession, SessionManager } from "@earendil-works/pi-coding-agent";
 import * as tools from "./tools.ts";
 import { buildPrompt } from "./prompt.ts";
+import { getAuthContext, getEventContext } from "./context.ts";
+import { checkoutRepository } from "./git.ts";
+
+const authCtx = getAuthContext();
+const eventCtx = await getEventContext();
+
+if (eventCtx.event.type === "pull request") {
+  checkoutRepository(authCtx, eventCtx.repository.full_name, eventCtx.event.head.label);
+} else {
+  checkoutRepository(authCtx, eventCtx.repository.full_name, eventCtx.repository.default_branch);
+}
 
 const { session } = await createAgentSession({
   sessionManager: SessionManager.inMemory(),
@@ -33,4 +44,5 @@ session.subscribe((l) => {
     }
 });
 
-await session.prompt(await buildPrompt());
+const prompt = await buildPrompt(authCtx, eventCtx);
+await session.prompt(prompt);
