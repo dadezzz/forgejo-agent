@@ -29,11 +29,11 @@ runs:
         else
           echo "Cache Miss! Downloading..."
           mkdir -p "/cache/forgejo-agent/$VERSION/"
-          curl -o "$CACHE" "https://git.zarantonello.dev/api/packages/infra/generic/forgejo-agent/$VERSION/forgejo-agent"
+          curl -so "$CACHE" "https://git.zarantonello.dev/api/packages/infra/generic/forgejo-agent/$VERSION/forgejo-agent"
         fi
 
-        cp "$CACHE" ./forgejo-agent
-        chmod +x forgejo-agent
+        cp "$CACHE" /usr/local/bin/forgejo-agent
+        chmod +x /usr/local/bin/forgejo-agent
       shell: sh
     - name: Run forgejo-agent
       run: |
@@ -79,6 +79,6 @@ runs:
         # The agent can simply use git push, without having to set upstream.
         git config --global push.autoSetupRemote true
 
-        ./forgejo-agent
+        forgejo-agent
       shell: sh
   using: composite
