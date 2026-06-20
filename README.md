@@ -1,7 +1,7 @@
-# forgejo-agent
+# ci-forgejo-agent
 
-`forgejo-agent` is a composite GitHub Action (Forgejo-compatible) that runs an
-AI coding agent in response to:
+`ci-forgejo-agent` is a composite GitHub Action (Forgejo-compatible) that runs
+an AI coding agent in response to:
 
 - **Issue comments** — when someone mentions the agent's username in a comment
 - **Issues opened** — when a new issue is opened mentioning the agent
@@ -53,7 +53,7 @@ pnpm install
 pnpm build
 
 # Run the final executable.
-./dist/forgejo-agent
+./dist/ci-forgejo-agent
 ```
 
 The build produces a single self-contained binary using Node.js

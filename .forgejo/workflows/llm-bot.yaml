@@ -5,7 +5,7 @@ jobs:
       # The composite action in action.yaml can save the binary to speed up
       # subsequent runs.
       volumes:
-        - forgejo-runner-cache-forgejo-agent:/cache/forgejo-agent
+        - forgejo-runner-cache-ci-forgejo-agent:/cache/ci-forgejo-agent
     name: LLM Bot response generation
     runs-on: srv-0-thi-home
     steps:

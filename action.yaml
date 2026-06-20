@@ -14,28 +14,28 @@ inputs:
     description: Email for git commits
     required: true
 
-name: forgejo-agent
+name: ci-forgejo-agent
 
 runs:
   steps:
     - env:
         VERSION: v1.3.9
-      name: Fetch the forgejo-agent binary
+      name: Fetch the ci-forgejo-agent binary
       run: |
-        CACHE="/cache/forgejo-agent/$VERSION/forgejo-agent"
+        CACHE="/cache/ci-forgejo-agent/$VERSION/ci-forgejo-agent"
 
         if [ -f "$CACHE" ]; then
           echo "Cache Hit! Copying from tool cache..."
         else
           echo "Cache Miss! Downloading..."
-          mkdir -p "/cache/forgejo-agent/$VERSION/"
-          curl -so "$CACHE" "https://git.zarantonello.dev/api/packages/infra/generic/forgejo-agent/$VERSION/forgejo-agent"
+          mkdir -p "/cache/ci-forgejo-agent/$VERSION/"
+          curl -so "$CACHE" "https://git.zarantonello.dev/api/packages/infra/generic/ci-forgejo-agent/$VERSION/ci-forgejo-agent"
         fi
 
-        cp "$CACHE" /usr/local/bin/forgejo-agent
-        chmod +x /usr/local/bin/forgejo-agent
+        cp "$CACHE" /usr/local/bin/ci-forgejo-agent
+        chmod +x /usr/local/bin/ci-forgejo-agent
       shell: sh
-    - name: Run forgejo-agent
+    - name: Run ci-forgejo-agent
       run: |
         export CTX_EVENT_NAME="${{ forge.event_name }}_${{ forge.event.action }}"
 
@@ -79,6 +79,6 @@ runs:
         # The agent can simply use git push, without having to set upstream.
         git config --global push.autoSetupRemote true
 
-        forgejo-agent
+        ci-forgejo-agent
       shell: sh
   using: composite

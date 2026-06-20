@@ -1,5 +1,5 @@
 {
   "main": "./dist/main.js",
   "mainFormat": "module",
-  "output": "dist/forgejo-agent"
+  "output": "dist/ci-forgejo-agent"
 }
