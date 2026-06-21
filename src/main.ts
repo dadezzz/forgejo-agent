@@ -25,17 +25,17 @@ session.subscribe((l) => {
         for (const m of l.message.content) {
           switch (m.type) {
             case "text":
-              console.log(m.text.trim());
+              console.log(`\n${m.text.trim()}`);
               break;
             case "thinking":
-              console.log("### START THINKING ###");
+              console.log("\n::group::Thinking");
               console.log(m.thinking.trim());
-              console.log("### END THINKING ###");
+              console.log("::endgroup::");
               break;
             case "toolCall":
-              console.log("### START TOOL CALL ###");
-              console.log(`${m.name} ${JSON.stringify(m.arguments)}`);
-              console.log("### END TOOL CALL ###");
+              console.log(`\n::group::Tool Call: ${m.name}`);
+              console.log(m.arguments);
+              console.log("::endgroup::");
               break;
           }
         }
@@ -45,8 +45,8 @@ session.subscribe((l) => {
 });
 
 const prompt = await buildPrompt(authCtx, eventCtx);
-console.log("### START PROMPT ###");
+console.log("::group::Prompt");
 console.log(prompt);
-console.log(`### END PROMPT ###`);
+console.log("::endgroup::");
 
 await session.prompt(prompt);
