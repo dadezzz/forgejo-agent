@@ -19,7 +19,7 @@ name: ci-forgejo-agent
 runs:
   steps:
     - env:
-        VERSION: v1.3.14
+        VERSION: v1.3.15
       name: Fetch the ci-forgejo-agent binary
       run: |
         CACHE="/cache/ci-forgejo-agent/$VERSION/ci-forgejo-agent"
