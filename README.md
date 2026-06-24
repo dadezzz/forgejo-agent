@@ -1,7 +1,7 @@
-# ci-forgejo-agent
+# forgejo-agent
 
-`ci-forgejo-agent` is a composite GitHub Action (Forgejo-compatible) that runs
-an AI coding agent in response to:
+`forgejo-agent` is a composite GitHub Action (Forgejo-compatible) that runs an
+AI coding agent in response to:
 
 - **Issue comments** — when someone mentions the agent's username in a comment
 - **Issues opened** — when a new issue is opened mentioning the agent
@@ -27,7 +27,7 @@ custom Forgejo API tools.
 Add this action to your Forgejo workflow:
 
 ```yaml
-- uses: infra/ci-forgejo-agent@v1
+- uses: projects/forgejo-agent@v1
   with:
     # Create a token for the llm-bot user with repository:write and issue:write
     # permissions.
@@ -53,7 +53,7 @@ pnpm install
 pnpm build
 
 # Run the final executable.
-./dist/ci-forgejo-agent
+./dist/forgejo-agent
 ```
 
 The build produces a single self-contained binary using Node.js

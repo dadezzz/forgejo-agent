@@ -33,7 +33,7 @@ session.subscribe((l) => {
               console.log("::endgroup::");
               break;
             case "toolCall":
-              console.log(`\n::group::Tool Call: ${m.name}`);
+              console.log(`\n::group::Tool call: ${m.name}`);
               console.log(m.arguments);
               console.log("::endgroup::");
               break;

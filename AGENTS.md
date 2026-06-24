@@ -4,7 +4,7 @@ This file provides guidance for AI agents operating in this repository.
 
 ## Project Overview
 
-`ci-forgejo-agent` is an AI coding agent for Forgejo, built on the
+`forgejo-agent` is an AI coding agent for Forgejo, built on the
 [Pi Coding Agent SDK](https://www.npmjs.com/package/@earendil-works/pi-coding-agent).
 It runs as a single self-contained binary and responds to Forgejo events
 (issues, pull requests, comments) to help with code review, bug fixes, and
