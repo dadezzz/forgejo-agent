@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@earendil-works/pi-coding-agent':
-        specifier: 0.79.8
-        version: 0.79.8(ws@8.21.0)(zod@4.4.3)
+        specifier: 0.79.9
+        version: 0.79.9(ws@8.21.0)(zod@4.4.3)
       typebox:
         specifier: 1.2.18
         version: 1.2.18
@@ -210,8 +210,8 @@ packages:
     engines: {node: '>=22.19.0'}
     hasBin: true
 
-  '@earendil-works/pi-coding-agent@0.79.8':
-    resolution: {integrity: sha512-wr9oTS/yrwURDXnYrONQgFgV7QDlwslXL/rvKU5X7TRtrGxIhippsRApXqYlRwSeMjb2YzgHMfZ/kAhOqrzoFQ==}
+  '@earendil-works/pi-coding-agent@0.79.9':
+    resolution: {integrity: sha512-8TZ796Zn0NE4vmhxG9hv4ZtJDGJzhqMjlmFg8ZkUKxfqB7LJa4ums2jSJKtnyAZfAamN6VzqzN0A82RNDqv8Ag==}
     engines: {node: '>=22.19.0'}
     hasBin: true
 
@@ -869,7 +869,7 @@ snapshots:
       '@aws-sdk/types': 3.973.13
       '@smithy/core': 3.25.1
       '@smithy/fetch-http-handler': 5.5.1
-      '@smithy/node-http-handler': 4.7.3
+      '@smithy/node-http-handler': 4.8.1
       '@smithy/types': 4.15.0
       tslib: 2.8.1
 
@@ -1119,7 +1119,7 @@ snapshots:
       - ws
       - zod
 
-  '@earendil-works/pi-coding-agent@0.79.8(ws@8.21.0)(zod@4.4.3)':
+  '@earendil-works/pi-coding-agent@0.79.9(ws@8.21.0)(zod@4.4.3)':
     dependencies:
       '@earendil-works/pi-agent-core': 0.79.10(ws@8.21.0)(zod@4.4.3)
       '@earendil-works/pi-ai': 0.79.10(ws@8.21.0)(zod@4.4.3)

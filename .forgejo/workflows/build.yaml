@@ -24,7 +24,7 @@ jobs:
           curl -s \
             -H "Authorization: Bearer ${{ secrets.REGISTRY_PASSWORD }}" \
             --upload-file dist/forgejo-agent \
-            https://git.zarantonello.dev/api/packages/infra/generic/forgejo-agent/${{ forge.ref_name }}/forgejo-agent
+            https://git.zarantonello.dev/api/packages/projects/generic/forgejo-agent/${{ forge.ref_name }}/forgejo-agent
 
 name: build.yaml
 
