@@ -78,6 +78,8 @@ runs:
         git config --global user.email "${{ inputs.git-email }}"
         # The agent can simply use git push, without having to set upstream.
         git config --global push.autoSetupRemote true
+        # Suppress warning about no default branch.
+        git config --global init.defaultBranch main
 
         forgejo-agent
       shell: sh

@@ -6,7 +6,7 @@ export async function buildPrompt(
 ): Promise<string> {
   let prompt = `You are the ${authCtx.username} user operating in the context of Forgejo ${eventCtx.event.type} number ${eventCtx.event.number} in the repository ${eventCtx.repository.full_name}.`;
 
-  prompt += `\n\nYou can use the \`git\` command through the \`bash\` tool.`;
+  prompt += `\n\nYou can use the \`git\` command through the \`bash\` tool. The repository is in the current directory.`;
   prompt += `\nIf you commit code you can upload it with \`git push\`; the upstream branch is created automatically.`;
 
   if (eventCtx.event.type === "pull request") {
