@@ -16,11 +16,11 @@ export function checkoutRepository(
   execFileSync("git", ["remote", "add", "origin", url.href]);
 
   // Fetch the head branch, where the agent will operate.
-  execFileSync("git", ["fetch", "origin", `${headBranch}:${headBranch}`]);
+  execFileSync("git", ["fetch", "-u", "origin", `${headBranch}:${headBranch}`]);
 
   // On PRs, fetch also the base branch, otherwise the agent gets confused since it can't find it.
   if (baseBranch) {
-    execFileSync("git", ["fetch", "origin", `${baseBranch}:${baseBranch}`]);
+    execFileSync("git", ["fetch", "-u", "origin", `${baseBranch}:${baseBranch}`]);
   }
 
   // Checkout the head branch.
