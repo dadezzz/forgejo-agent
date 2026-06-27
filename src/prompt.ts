@@ -1,6 +1,6 @@
 import type { getAuthContext, getEventContext } from "./context.ts";
 
-export async function buildPrompt(
+export async function buildSystemPrompt(
   authCtx: ReturnType<typeof getAuthContext>,
   eventCtx: Awaited<ReturnType<typeof getEventContext>>,
 ): Promise<string> {
@@ -23,7 +23,11 @@ export async function buildPrompt(
     prompt += `\n\nAt the end, you must respond with a comment in the ${eventCtx.event.type} using the \`create-issue-comment\` tool.`;
   }
 
-  prompt += `\n\n---\n\n### start ${eventCtx.event.type} content from user ${eventCtx.event.user.username} ###\n# ${eventCtx.event.title}`;
+  return prompt;
+}
+
+export async function buildUserPrompt(eventCtx: Awaited<ReturnType<typeof getEventContext>>): Promise<string> {
+  let prompt = `### start ${eventCtx.event.type} content from user ${eventCtx.event.user.username} ###\n# ${eventCtx.event.title}`;
   prompt += eventCtx.event.body ? `\n\n${eventCtx.event.body}` : "";
   prompt += `\n### end ${eventCtx.event.type} content ###`;
 

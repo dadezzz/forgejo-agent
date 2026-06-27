@@ -20,8 +20,7 @@ export const eventNameSchema = Type.Union([
   Type.Literal("pull_request_review_requested"),
 ]);
 
-export const issueIdSchema = Type.String({
-  pattern: /[0-9]+/,
+export const issueIdSchema = Type.Number({
   description: "Number used to identify the Forgejo issue",
 });
 
@@ -62,8 +61,7 @@ export const pullRequestSchema = Type.Object({
 
 export const commitIdSchema = Type.String({ description: "Commit SHA" });
 
-export const prReviewIdSchema = Type.String({
-  pattern: /[0-9]+/,
+export const prReviewIdSchema = Type.Number({
   description: "Number used to identify the review",
 });
 

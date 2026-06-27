@@ -1,6 +1,13 @@
-import { createAgentSession, SessionManager, type ToolDefinition } from "@earendil-works/pi-coding-agent";
+import {
+  createAgentSession,
+  DefaultResourceLoader,
+  getAgentDir,
+  SessionManager,
+  type ToolDefinition,
+} from "@earendil-works/pi-coding-agent";
 import * as tools from "./tools.ts";
-import { buildPrompt } from "./prompt.ts";
+import { buildSystemPrompt, buildUserPrompt } from "./prompt.ts";
+import process from "node:process";
 import { getAuthContext, getEventContext } from "./context.ts";
 import { checkoutRepository } from "./git.ts";
 
@@ -19,9 +26,23 @@ if (eventCtx.event.name === "pull_request_review_requested") {
   customTools.push(tools.createPrReview);
 }
 
+const systemPrompt = await buildSystemPrompt(authCtx, eventCtx);
+console.log("::group::System prompt");
+console.log(systemPrompt);
+console.log("::endgroup::");
+
+const resourceLoader = new DefaultResourceLoader({
+  cwd: process.cwd(),
+  agentDir: getAgentDir(),
+  appendSystemPrompt: [systemPrompt],
+});
+
+resourceLoader.reload();
+
 const { session } = await createAgentSession({
   sessionManager: SessionManager.inMemory(),
   customTools,
+  resourceLoader,
 });
 
 session.subscribe((l) => {
@@ -50,9 +71,9 @@ session.subscribe((l) => {
     }
 });
 
-const prompt = await buildPrompt(authCtx, eventCtx);
-console.log("::group::Prompt");
-console.log(prompt);
+const userPrompt = await buildUserPrompt(eventCtx);
+console.log("::group::User prompt");
+console.log(userPrompt);
 console.log("::endgroup::");
 
-await session.prompt(prompt);
+await session.prompt(userPrompt);
