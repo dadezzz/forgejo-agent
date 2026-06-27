@@ -1,7 +1,7 @@
 jobs:
   respond:
     container:
-      image: git.zarantonello.dev/projects/forgejo-agent:ci@sha256:4186824504903f1222b15e3269d903b0f479c0abc7d3ee57235af9baee9c1ff9
+      image: git.zarantonello.dev/projects/forgejo-agent:ci@sha256:94be7206f488013c5ab415bb14c76f36bf825824a9b85729684600e026c6ef12
       # The composite action in action.yaml can save the binary to speed up
       # subsequent runs.
       volumes:
@@ -15,7 +15,7 @@ jobs:
           mkdir -p $HOME/.pi/agent/
           echo '{"providers":{"llama-server":{"baseUrl":"http://llama.zarantonello.dev/v1","api":"openai-completions","apiKey":"llama","models":[{"id":"Qwen3.6-35B-A3B","contextWindow":65536}]}}}' > $HOME/.pi/agent/models.json
       - name: Generate response
-        uses: https://git.zarantonello.dev/projects/forgejo-agent@2fcf02c366c8ab716ec4bed95fb3cf4e3f6ae3a0 # v1.4.7
+        uses: https://git.zarantonello.dev/projects/forgejo-agent@6d0787182164795f04683a76ab4409386449ded0 # v1.4.8
         with:
           auth-token: ${{ secrets.AGENT_TOKEN }}
           auth-username: llm-bot
