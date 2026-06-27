@@ -3,7 +3,7 @@ import {
   authTokenSchema,
   authUsernameSchema,
   eventNameSchema,
-  issueNumberSchema,
+  issueIdSchema,
   repositoryFullNameSchema,
 } from "./schemas.ts";
 import process from "node:process";
@@ -18,7 +18,7 @@ export function getAuthContext() {
 
 export async function getEventContext() {
   const repositoryName = Value.Parse(repositoryFullNameSchema, process.env.FORGEJO_REPOSITORY);
-  const issueNumber = Number(Value.Parse(issueNumberSchema, process.env.CTX_ISSUE_NUMBER));
+  const issueNumber = Number(Value.Parse(issueIdSchema, process.env.CTX_ISSUE_NUMBER));
 
   const issue = await getIssue(repositoryName, issueNumber);
 

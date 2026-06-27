@@ -1,6 +1,6 @@
 import { defineTool } from "@earendil-works/pi-coding-agent";
 import Type from "typebox";
-import { patchIssue, postIssue, postIssueComment, postPullRequest } from "./forgejo/index.ts";
+import { patchIssue, postIssue, postIssueComment, postPrReview, postPullRequest } from "./forgejo/index.ts";
 import * as schemas from "./schemas.ts";
 
 export const closeIssue = defineTool({
@@ -9,7 +9,7 @@ export const closeIssue = defineTool({
   description: "Closes an issue in a Forgejo repository.",
   parameters: Type.Object({
     repository: schemas.repositoryFullNameSchema,
-    issueNumber: schemas.issueNumberSchema,
+    issueNumber: schemas.issueIdSchema,
   }),
   execute: async (_toolCallId, params) => {
     const issue = await patchIssue(params.repository, Number(params.issueNumber), { state: "closed" });
@@ -38,7 +38,7 @@ export const createIssueComment = defineTool({
   description: "Creates a comment in an issue or pull request in a Forgejo repository",
   parameters: Type.Object({
     repository: schemas.repositoryFullNameSchema,
-    issueNumber: schemas.issueNumberSchema,
+    issueNumber: schemas.issueIdSchema,
     body: Type.String({ description: "Body of the comment" }),
   }),
   execute: async (_toolCallId, params) => {
@@ -47,9 +47,9 @@ export const createIssueComment = defineTool({
   },
 });
 
-export const createPullRequest = defineTool({
-  label: "create-pull-request",
-  name: "create-pull-request",
+export const createPr = defineTool({
+  label: "create-pr",
+  name: "create-pr",
   description: "Creates a pull request in a Forgejo repository. Doesn't handle git operations",
   parameters: Type.Object({
     repository: schemas.repositoryFullNameSchema,
@@ -67,5 +67,46 @@ export const createPullRequest = defineTool({
     });
 
     return { content: [{ type: "text", text: `ok, created pull request ${pr.number}` }], details: null };
+  },
+});
+
+export const createPrReview = defineTool({
+  label: "create-pr-review",
+  name: "create-pr-review",
+  description: "Submits a review for a pull request",
+  parameters: Type.Object({
+    repository: schemas.repositoryFullNameSchema,
+    prNumber: schemas.issueIdSchema,
+    body: Type.String({ description: "Main comment body" }),
+    comments: Type.Array(
+      Type.Object({
+        body: Type.String({ description: "Body of the comment" }),
+        path: Type.String({ description: "Path in the workspace" }),
+        line: Type.Integer({ description: "File line of the comment" }),
+        side: Type.Union([Type.Literal("BASE"), Type.Literal("HEAD")], {
+          description: "HEAD if the comment is on the updated file, BASE otherwise",
+        }),
+      }),
+    ),
+    commitId: schemas.commitIdSchema,
+    event: schemas.prReviewEventSchema,
+  }),
+  execute: async (_toolCallId, params) => {
+    const review = await postPrReview(params.repository, Number(params.prNumber), {
+      body: params.body,
+      comments: params.comments.map((c) => ({
+        body: c.body,
+        new_position: c.side === "HEAD" ? c.line : 0,
+        old_position: c.side === "BASE" ? c.line : 0,
+        path: c.path,
+      })),
+      commit_id: params.commitId,
+      event: params.event,
+    });
+
+    return {
+      content: [{ type: "text", text: `ok, created review ${review.id} for pull request ${params.prNumber}` }],
+      details: null,
+    };
   },
 });

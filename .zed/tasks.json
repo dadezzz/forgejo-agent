@@ -1,0 +1,12 @@
+[
+  {
+    "label": "Format files",
+    "command": "devcontainer exec pnpm format:fix",
+    "reveal": "no_focus",
+    "shell": {
+      "program": "sh"
+    },
+    "hide": "on_success",
+    "save": "all"
+  }
+]

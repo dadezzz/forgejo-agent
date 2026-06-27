@@ -15,7 +15,7 @@ if (eventCtx.event.type === "pull request") {
 
 const { session } = await createAgentSession({
   sessionManager: SessionManager.inMemory(),
-  customTools: [tools.createIssue, tools.closeIssue, tools.createIssueComment, tools.createPullRequest],
+  customTools: [tools.createIssue, tools.closeIssue, tools.createIssueComment, tools.createPr],
 });
 
 session.subscribe((l) => {

@@ -14,13 +14,13 @@ export async function buildPrompt(
     prompt += "\nYou can make changes, but must commit and push them upstream or they will be lost.";
   } else {
     prompt += `\nThe code you are seeing is from the upstream default branch: ${eventCtx.repository.default_branch}.`;
-    prompt += `\nYou can make changes, but must commit and push them in a new branch and create a pull request (\`create-pull-request\` tool) or they will be lost.`;
+    prompt += `\nYou can make changes, but must commit and push them in a new branch and create a pull request (\`create-pr\` tool) or they will be lost.`;
   }
 
   if (eventCtx.event.name === "pull_request_review_requested") {
-    prompt += `\n\nYou have been assigned as a reviewer of the pull request. Report any findings with the \`submit-review\` tool.`;
+    prompt += `\n\nYou have been assigned as a reviewer of the pull request. Report any findings with the \`create-pr-review\` tool.`;
   } else {
-    prompt += `\n\nAt the end, you should respond with a comment in the ${eventCtx.event.type} using the create-issue-comment tool`;
+    prompt += `\n\nAt the end, you must respond with a comment in the ${eventCtx.event.type} using the \`create-issue-comment\` tool.`;
   }
 
   prompt += `\n\n---\n\n### start ${eventCtx.event.type} content from user ${eventCtx.event.user.username} ###\n# ${eventCtx.event.title}`;

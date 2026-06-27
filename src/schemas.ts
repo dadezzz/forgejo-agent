@@ -20,21 +20,23 @@ export const eventNameSchema = Type.Union([
   Type.Literal("pull_request_review_requested"),
 ]);
 
-export const issueNumberSchema = Type.String({
+export const issueIdSchema = Type.String({
   pattern: /[0-9]+/,
-  description: "Number assigned to the Forgejo issue",
+  description: "Number used to identify the Forgejo issue",
 });
 
 const issueUserSchema = Type.Object({
   username: Type.String(),
 });
 
+const issueStateSchema = Type.Union([Type.Literal("open"), "closed"]);
+
 export const issueSchema = Type.Object({
   number: Type.Number(),
   user: issueUserSchema,
   title: Type.String(),
   body: Type.String(),
-  state: Type.Union([Type.Literal("open"), Type.Literal("closed")]),
+  state: issueStateSchema,
   pull_request: Type.Union([Type.Object({}), Type.Null()]),
 });
 
@@ -53,11 +55,28 @@ export const pullRequestSchema = Type.Object({
   user: issueUserSchema,
   title: Type.String(),
   body: Type.String(),
-  state: Type.Union([Type.Literal("open"), Type.Literal("closed")]),
+  state: issueStateSchema,
   head: branchSchema,
   base: branchSchema,
 });
 
-export const postReviewRequestSchema = Type.Object({
-  number: Type.Number(),
+export const commitIdSchema = Type.String({ description: "Commit SHA" });
+
+export const prReviewIdSchema = Type.String({
+  pattern: /[0-9]+/,
+  description: "Number used to identify the review",
+});
+
+export const prReviewEventSchema = Type.Union(
+  [Type.Literal("APPROVE"), Type.Literal("REQUEST_CHANGES"), Type.Literal("COMMENT")],
+  { description: "Resolution type of the review" },
+);
+
+export const prReviewCommentSchema = Type.Object({
+  body: Type.String(),
+});
+
+export const prReviewSchema = Type.Object({
+  id: prReviewIdSchema,
+  body: Type.String(),
 });
