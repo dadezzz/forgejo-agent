@@ -9,7 +9,7 @@ jobs:
       volumes:
         - forgejo-runner-cache-pnpm:/usr/local/pnpm/store
     name: Checks with linters
-    runs-on: srv-0-nbg-hetz
+    runs-on: srv-generic
     steps:
       - name: Clone the repository
         run: |

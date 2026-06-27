@@ -1,4 +1,4 @@
-import { createAgentSession, SessionManager } from "@earendil-works/pi-coding-agent";
+import { createAgentSession, SessionManager, ToolDefinition } from "@earendil-works/pi-coding-agent";
 import * as tools from "./tools.ts";
 import { buildPrompt } from "./prompt.ts";
 import { getAuthContext, getEventContext } from "./context.ts";
@@ -13,9 +13,15 @@ if (eventCtx.event.type === "pull request") {
   checkoutRepository(authCtx, eventCtx.repository.full_name, eventCtx.repository.default_branch);
 }
 
+const customTools: ToolDefinition[] = [tools.createIssue, tools.closeIssue, tools.createIssueComment, tools.createPr];
+
+if (eventCtx.event.name === "pull_request_review_requested") {
+  customTools.push(tools.createPrReview);
+}
+
 const { session } = await createAgentSession({
   sessionManager: SessionManager.inMemory(),
-  customTools: [tools.createIssue, tools.closeIssue, tools.createIssueComment, tools.createPr],
+  customTools,
 });
 
 session.subscribe((l) => {
