@@ -1,4 +1,4 @@
-import { createAgentSession, SessionManager, ToolDefinition } from "@earendil-works/pi-coding-agent";
+import { createAgentSession, SessionManager, type ToolDefinition } from "@earendil-works/pi-coding-agent";
 import * as tools from "./tools.ts";
 import { buildPrompt } from "./prompt.ts";
 import { getAuthContext, getEventContext } from "./context.ts";
@@ -8,7 +8,7 @@ const authCtx = getAuthContext();
 const eventCtx = await getEventContext();
 
 if (eventCtx.event.type === "pull request") {
-  checkoutRepository(authCtx, eventCtx.repository.full_name, eventCtx.event.head.label);
+  checkoutRepository(authCtx, eventCtx.repository.full_name, eventCtx.event.head.label, eventCtx.event.base.label);
 } else {
   checkoutRepository(authCtx, eventCtx.repository.full_name, eventCtx.repository.default_branch);
 }

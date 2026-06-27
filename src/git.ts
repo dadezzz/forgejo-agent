@@ -1,16 +1,28 @@
 import { execFileSync } from "node:child_process";
-import Value from "typebox/value";
-import process from "node:process";
-import Type from "typebox";
 import type { getAuthContext } from "./context.ts";
 import { apiUrl } from "./forgejo/fetch.ts";
 
-const workspaceDir = Value.Parse(Type.String(), process.env.FORGEJO_WORKSPACE);
-
-export function checkoutRepository(authCtx: ReturnType<typeof getAuthContext>, repositoryName: string, branch: string) {
+export function checkoutRepository(
+  authCtx: ReturnType<typeof getAuthContext>,
+  repositoryName: string,
+  headBranch: string,
+  baseBranch?: string,
+) {
   const url = new URL(apiUrl);
   url.password = authCtx.token;
   url.pathname = repositoryName;
 
-  execFileSync("git", ["clone", `--branch=${branch}`, url.href, workspaceDir]);
+  execFileSync("git", ["init"]);
+  execFileSync("git", ["remote", "add", "origin", url.href]);
+
+  // Fetch the head branch, where the agent will operate.
+  execFileSync("git", ["fetch", "origin", `${headBranch}:${headBranch}`]);
+
+  // On PRs, fetch also the base branch, otherwise the agent gets confused since it can't find it.
+  if (baseBranch) {
+    execFileSync("git", ["fetch", "origin", `${baseBranch}:${baseBranch}`]);
+  }
+
+  // Checkout the head branch.
+  execFileSync("git", ["checkout", headBranch]);
 }
