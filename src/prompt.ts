@@ -1,9 +1,9 @@
 import type { getAuthContext, getEventContext } from "./context.ts";
 
-export async function buildSystemPrompt(
+export function buildPrompt(
   authCtx: ReturnType<typeof getAuthContext>,
   eventCtx: Awaited<ReturnType<typeof getEventContext>>,
-): Promise<string> {
+): string {
   let prompt = `You are the ${authCtx.username} user operating in the context of Forgejo ${eventCtx.event.type} number ${eventCtx.event.number} in the repository ${eventCtx.repository.full_name}.`;
 
   prompt += `\n\nYou can use the \`git\` command through the \`bash\` tool. The repository is in the current directory.`;
@@ -23,11 +23,7 @@ export async function buildSystemPrompt(
     prompt += `\n\nAt the end, you must respond with a comment in the ${eventCtx.event.type} using the \`create-issue-comment\` tool.`;
   }
 
-  return prompt;
-}
-
-export async function buildUserPrompt(eventCtx: Awaited<ReturnType<typeof getEventContext>>): Promise<string> {
-  let prompt = `### start ${eventCtx.event.type} content from user ${eventCtx.event.user.username} ###\n# ${eventCtx.event.title}`;
+  prompt += `\n\n### start ${eventCtx.event.type} content from user ${eventCtx.event.user.username} ###\n# ${eventCtx.event.title}`;
   prompt += eventCtx.event.body ? `\n\n${eventCtx.event.body}` : "";
   prompt += `\n### end ${eventCtx.event.type} content ###`;
 
