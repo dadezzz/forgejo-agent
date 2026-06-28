@@ -66,7 +66,7 @@ export const prReviewIdSchema = Type.Number({
 });
 
 export const prReviewEventSchema = Type.Union(
-  [Type.Literal("APPROVE"), Type.Literal("REQUEST_CHANGES"), Type.Literal("COMMENT")],
+  [Type.Literal("APPROVED"), Type.Literal("REQUEST_CHANGES"), Type.Literal("COMMENT")],
   { description: "Resolution type of the review" },
 );
 
