@@ -2,6 +2,10 @@ import { execFileSync } from "node:child_process";
 import type { getAuthContext } from "./context.ts";
 import { apiUrl } from "./forgejo/fetch.ts";
 
+export function getLatestCommitId(): string {
+  return execFileSync("git", ["rev-parse", "HEAD"]).toString().trim();
+}
+
 export function checkoutRepository(
   authCtx: ReturnType<typeof getAuthContext>,
   repositoryName: string,

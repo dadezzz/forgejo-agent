@@ -1,5 +1,6 @@
 import { defineTool } from "@earendil-works/pi-coding-agent";
 import Type from "typebox";
+import { getLatestCommitId } from "./git.ts";
 import { patchIssue, postIssue, postIssueComment, postPrReview, postPullRequest } from "./forgejo/index.ts";
 import * as schemas from "./schemas.ts";
 
@@ -88,7 +89,6 @@ export const createPrReview = defineTool({
         }),
       }),
     ),
-    commitId: schemas.commitIdSchema,
     event: schemas.prReviewEventSchema,
   }),
   execute: async (_toolCallId, params) => {
@@ -100,7 +100,7 @@ export const createPrReview = defineTool({
         old_position: c.side === "BASE" ? c.line : 0,
         path: c.path,
       })),
-      commit_id: params.commitId,
+      commit_id: getLatestCommitId(),
       event: params.event,
     });
 

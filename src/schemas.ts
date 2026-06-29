@@ -59,8 +59,6 @@ export const pullRequestSchema = Type.Object({
   base: branchSchema,
 });
 
-export const commitIdSchema = Type.String({ description: "Commit SHA" });
-
 export const prReviewIdSchema = Type.Number({
   description: "Number used to identify the review",
 });
