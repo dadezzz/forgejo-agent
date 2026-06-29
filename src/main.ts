@@ -24,30 +24,43 @@ const { session } = await createAgentSession({
   customTools,
 });
 
-session.subscribe((l) => {
-  if (l.type === "message_end")
-    switch (l.message.role) {
-      case "assistant":
-        for (const m of l.message.content) {
-          switch (m.type) {
-            case "text":
-              console.log(`\n${m.text.trim()}`);
-              break;
-            case "thinking":
-              console.log("\n::group::Thinking");
-              console.log(m.thinking.trim());
-              console.log("::endgroup::");
-              break;
-            case "toolCall":
-              console.log(`\n::group::Tool call: ${m.name}`);
-              console.log(m.arguments);
-              console.log("::endgroup::");
-              break;
-          }
-        }
+const pendingToolCallArgs = new Map<string, unknown>();
 
-        break;
+session.subscribe((l) => {
+  switch (l.type) {
+    case "message_end":
+      switch (l.message.role) {
+        case "assistant":
+          for (const m of l.message.content) {
+            switch (m.type) {
+              case "text":
+                console.log(`\n${m.text.trim()}`);
+                break;
+              case "thinking":
+                console.log("\n::group::Thinking");
+                console.log(m.thinking.trim());
+                console.log("::endgroup::");
+                break;
+              case "toolCall":
+                pendingToolCallArgs.set(m.id, m.arguments);
+                break;
+            }
+          }
+
+          break;
+      }
+
+      break;
+    case "tool_execution_end": {
+      const args = pendingToolCallArgs.get(l.toolCallId);
+      console.log(`\n::group::Tool call: ${l.toolName}`);
+      console.log(`args = ${args}`);
+      console.log(`result = ${l.result}`);
+      console.log("::endgroup::");
+
+      break;
     }
+  }
 });
 
 const userPrompt = buildPrompt(authCtx, eventCtx);
