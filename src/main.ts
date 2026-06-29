@@ -1,4 +1,5 @@
 import { createAgentSession, SessionManager, type ToolDefinition } from "@earendil-works/pi-coding-agent";
+import { inspect } from "node:util";
 import * as tools from "./tools.ts";
 import { buildPrompt } from "./prompt.ts";
 import { getAuthContext, getEventContext } from "./context.ts";
@@ -28,7 +29,7 @@ const pendingToolCallArgs = new Map<string, unknown>();
 
 session.subscribe((l) => {
   switch (l.type) {
-    case "message_end":
+    case "message_end": {
       switch (l.message.role) {
         case "assistant":
           for (const m of l.message.content) {
@@ -51,11 +52,12 @@ session.subscribe((l) => {
       }
 
       break;
+    }
     case "tool_execution_end": {
       const args = pendingToolCallArgs.get(l.toolCallId);
       console.log(`\n::group::Tool call: ${l.toolName}`);
-      console.log(`args = ${args}`);
-      console.log(`result = ${l.result}`);
+      console.log(`args = ${inspect(args, { depth: null })}`);
+      console.log(`result = ${inspect(l.result, { depth: null })}`);
       console.log("::endgroup::");
 
       break;
