@@ -19,7 +19,7 @@ name: forgejo-agent
 runs:
   steps:
     - env:
-        VERSION: v1.7.4
+        VERSION: v1.7.5
       name: Fetch the forgejo-agent binary
       run: |
         CACHE="/cache/forgejo-agent/$VERSION/forgejo-agent"
