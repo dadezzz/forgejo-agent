@@ -1,7 +1,7 @@
 jobs:
   respond:
     container:
-      image: git.zarantonello.dev/projects/forgejo-agent:ci@sha256:e3ef64004d55046a8a090df06ce1ec2b2ec242d1d55464fb3437996f4d02479c
+      image: git.zarantonello.dev/projects/forgejo-agent:ci@sha256:7f409f8506a3f615ab80cee03c346b74edde85acbbc75dec6386e8af9a679cf3
       # The composite action in action.yaml can save the binary to speed up
       # subsequent runs.
       volumes:
