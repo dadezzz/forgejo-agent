@@ -14,10 +14,15 @@ if (eventCtx.event.type === "pull request") {
   checkoutRepository(authCtx, eventCtx.repository.full_name, eventCtx.repository.default_branch);
 }
 
-const customTools: ToolDefinition[] = [tools.createIssue, tools.closeIssue, tools.createIssueComment, tools.createPr];
+const customTools: ToolDefinition[] = [
+  tools.createCloseIssueTool(eventCtx.repository.full_name, eventCtx.event.number),
+  tools.createCreateIssueTool(eventCtx.repository.full_name),
+  tools.createCreateIssueCommentTool(eventCtx.repository.full_name, eventCtx.event.number),
+  tools.createCreatePrTool(eventCtx.repository.full_name),
+];
 
 if (eventCtx.event.name === "pull_request_review_requested") {
-  customTools.push(tools.createPrReview);
+  customTools.push(tools.createCreatePrReviewTool(eventCtx.repository.full_name, eventCtx.event.number));
 }
 
 const { session } = await createAgentSession({
