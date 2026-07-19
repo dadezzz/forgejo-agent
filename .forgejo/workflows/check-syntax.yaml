@@ -5,7 +5,7 @@ concurrency:
 jobs:
   check:
     container:
-      image: git.zarantonello.dev/projects/forgejo-agent:ci@sha256:f2bc23bfa83984d94e5bf7e221a6501cd4a894f9516167e696658207ce913b1e
+      image: git.zarantonello.dev/projects/forgejo-agent:ci@sha256:a0d832c649ded9132f4eacf90c143019c42e9c9bd840b36dd15296fef5d61bb2
       volumes:
         - forgejo-runner-cache-pnpm:/usr/local/pnpm/store
     name: Checks with static tools
