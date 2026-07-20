@@ -94,7 +94,7 @@ export function createCreatePrReviewTool(defaultRepository: string, defaultPrId:
     parameters: Type.Object({
       repository: Type.Optional(schemas.repositoryFullNameSchema),
       prId: Type.Optional(schemas.issueIdSchema),
-      body: Type.String({ description: "Main comment body" }),
+      body: Type.String({ description: "Comment body to post in the PR discussion" }),
       comments: Type.Array(
         Type.Object({
           body: Type.String({ description: "Body of the comment" }),
@@ -105,7 +105,7 @@ export function createCreatePrReviewTool(defaultRepository: string, defaultPrId:
           }),
         }),
       ),
-      event: schemas.prReviewEventSchema,
+      verdict: schemas.prReviewEventSchema,
     }),
     execute: async (_toolCallId, params) => {
       const repository = params.repository ?? defaultRepository;
@@ -120,7 +120,7 @@ export function createCreatePrReviewTool(defaultRepository: string, defaultPrId:
           path: c.path,
         })),
         commit_id: getLatestCommitId(),
-        event: params.event,
+        event: params.verdict,
       });
 
       return {
