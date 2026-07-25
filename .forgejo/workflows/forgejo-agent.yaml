@@ -8,7 +8,7 @@ jobs:
         - forgejo-runner-cache-forgejo-agent:/cache/forgejo-agent
         - forgejo-runner-cache-pnpm:/usr/local/pnpm/store
     name: LLM Bot response generation
-    runs-on: srv-0-thi-home
+    runs-on: srv-home
     steps:
       - name: Configure pi
         run: |
