@@ -6,7 +6,7 @@ concurrency:
 jobs:
   release:
     container:
-      image: git.zarantonello.dev/infra/ci-semantic-release:latest@sha256:3bc4fd68fac0532043954176276899a97bcbc548bf83bae73aafc2c584c306b9
+      image: git.zarantonello.dev/infra/ci-semantic-release:latest@sha256:3cb4bcbb0e9e3ae9620871596ae720572dfb5bcb42b01a6c448a29010cd25677
     name: Generate next relase tag
     runs-on: srv-generic
     steps:
