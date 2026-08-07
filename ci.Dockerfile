@@ -1,9 +1,9 @@
-FROM docker.io/library/node:26.5.1-alpine@sha256:233761595746769ebfdb6090f44fc7cdf818ae0ce62d2b37e0367723b9823e36
+FROM docker.io/library/node:26.7.0-alpine@sha256:aadf416b2cdce311a8811ba3f0608a61b77dbf997500e2eafe781b51f6a0b019
 
 RUN apk add --no-cache curl git
 
 # renovate: datasource=npm depName=pnpm versioning=npm
-ENV PNPM_VERSION="11.18.0"
+ENV PNPM_VERSION="11.20.0"
 
 RUN --mount=type=cache,sharing=locked,target=/root/.npm npm install -g "pnpm@$PNPM_VERSION"
 
