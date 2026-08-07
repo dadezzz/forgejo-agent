@@ -9,7 +9,7 @@ jobs:
     env:
       IMAGE: git.zarantonello.dev/${{ forge.repository }}:ci
     name: Build the CI container
-    runs-on: srv-0-nbg-hetz
+    runs-on: srv-hetz-nbg-0
     steps:
       - name: Clone the repository
         run: |
@@ -34,3 +34,4 @@ name: build-ci.yaml
       - main
     paths:
       - ci.Dockerfile
+  workflow_dispatch: {}
