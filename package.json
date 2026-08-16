@@ -17,7 +17,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.8",
     "@types/node": "25.9.5",
-    "rolldown": "1.2.3",
+    "rolldown": "1.2.4",
     "typescript": "7.0.2"
   }
 }
