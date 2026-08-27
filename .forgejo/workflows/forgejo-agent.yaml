@@ -1,7 +1,7 @@
 jobs:
   respond:
     container:
-      image: git.zarantonello.dev/projects/forgejo-agent:ci@sha256:c469b195f806741b962199133e5e0590f649f9d88347c4f92bdfb285c14f5e0c
+      image: git.zarantonello.dev/projects/forgejo-agent-ci:v2026.01.01.1
       # The composite action in action.yaml can save the binary to speed up
       # subsequent runs.
       volumes:
@@ -17,10 +17,10 @@ jobs:
       - name: Generate response
         uses: https://git.zarantonello.dev/projects/forgejo-agent@c9840809ef071f70765af4b47e3d810079075384 # v1.8.20
         with:
-          auth-token: ${{ secrets.AGENT_TOKEN }}
-          auth-username: llm-bot
-          git-author: LLM [bot]
-          git-email: llm-bot@git.zarantonello.dev
+          auth-token: ${{ secrets.CI_BOT_TOKEN }}
+          auth-username: ci-bot
+          git-author: CI [bot]
+          git-email: ci-bot@git.zarantonello.dev
 
 name: forgejo-agent
 

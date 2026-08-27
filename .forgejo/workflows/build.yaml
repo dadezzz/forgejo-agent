@@ -5,7 +5,7 @@ concurrency:
 jobs:
   build:
     container:
-      image: git.zarantonello.dev/projects/forgejo-agent:ci@sha256:c469b195f806741b962199133e5e0590f649f9d88347c4f92bdfb285c14f5e0c
+      image: git.zarantonello.dev/projects/forgejo-agent-ci:v2026.01.01.1
       volumes:
         - forgejo-runner-cache-pnpm:/usr/local/pnpm/store
     name: Build the executable
@@ -22,7 +22,7 @@ jobs:
       - name: Upload the package
         run: |
           curl -s \
-            -H "Authorization: Bearer ${{ secrets.REGISTRY_PASSWORD }}" \
+            -H "Authorization: Bearer ${{ secrets.CI_BOT_REGISTRY_TOKEN }}" \
             --upload-file dist/forgejo-agent \
             https://git.zarantonello.dev/api/packages/projects/generic/forgejo-agent/${{ forge.ref_name }}/forgejo-agent
 
@@ -31,4 +31,4 @@ name: build.yaml
 "on":
   push:
     tags:
-      - "*"
+      - v*

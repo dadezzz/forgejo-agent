@@ -6,25 +6,38 @@ jobs:
   release:
     container:
       image: git.zarantonello.dev/infra/ci-semantic-release:v1.0.2@sha256:e04bd8d1ef225a118e6c79be72661d7d1162866833a1a0f73c2a13bc4c09cd00
-    name: Generate next release tag
+    name: Generate next CI release tag
     runs-on: srv-generic
     steps:
       - name: Clone the repository
         run: |
           git clone --filter=blob:none --no-checkout https://${{ secrets.CI_BOT_TOKEN }}@git.zarantonello.dev/${{ forge.repository }} ${{ forge.workspace }};
           git checkout --quiet ${{ forge.sha }};
-      - env:
-          FORGEJO_API_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
-        name: Run semantic-release
+      - name: Generate and push the tag
         run: |
           git config --global user.name "CI [bot]"
           git config --global user.email "ci-bot@git.zarantonello.dev"
 
-          semantic-release
+          DATE=$(date -u +'%Y.%m.%d')
+          PREV_TAG=$(git tag -l "ci-v${DATE}.*" | sort -V | tail -n1)
 
-name: release.yaml
+          if [ -z "$PREV_TAG" ]; then
+            REVISION=1
+          else
+            REVISION=$(( ${PREV_TAG##*.} + 1 ))
+          fi
+
+          NEW_TAG="ci-v${DATE}.${REVISION}"
+
+          git tag "$NEW_TAG"
+          git push origin "$NEW_TAG"
+
+name: release-ci.yaml
 
 "on":
   push:
     branches:
       - main
+    paths:
+      - ci.Dockerfile
+  workflow_dispatch: {}
