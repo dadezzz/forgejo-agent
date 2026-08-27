@@ -11,7 +11,7 @@
     "lint:fix": "biome lint --fix"
   },
   "dependencies": {
-    "@earendil-works/pi-coding-agent": "0.84.2",
+    "@earendil-works/pi-coding-agent": "0.84.3",
     "typebox": "1.3.18"
   },
   "devDependencies": {
