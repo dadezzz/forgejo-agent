@@ -29,7 +29,7 @@ runs:
         else
           echo "Cache Miss! Downloading..."
           mkdir -p "/cache/forgejo-agent/$VERSION/"
-          curl -so "$CACHE" "https://git.zarantonello.dev/api/packages/projects/generic/forgejo-agent/$VERSION/forgejo-agent"
+          curl -Lso "$CACHE" "https://git.zarantonello.dev/api/packages/projects/generic/forgejo-agent/$VERSION/forgejo-agent"
         fi
 
         cp "$CACHE" /usr/local/bin/forgejo-agent
