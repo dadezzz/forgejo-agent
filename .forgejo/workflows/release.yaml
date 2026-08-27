@@ -1,5 +1,6 @@
 concurrency:
-  cancel-in-progress: true
+  # Pushing a new release on main would cancel the job that pushed it.
+  cancel-in-progress: false
   group: ${{ forge.ref }}-${{ forge.workflow }}
 
 jobs:
