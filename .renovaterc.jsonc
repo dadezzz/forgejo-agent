@@ -8,25 +8,24 @@
     ":semanticCommits"
   ],
   "packageRules": [
+    // Automerge and group devcontainer, actions and ci deps.
     {
       "automerge": true,
       "groupName": "CI dependencies",
       "groupSlug": "ci",
-      "matchFileNames": [".devcontainer/**", ".forgejo/**", "ci.Dockerfile"],
+      "matchFileNames": [".devcontainer/**", ".forgejo/**"],
       "matchUpdateTypes": ["!major"],
       "semanticCommitType": "ci"
     },
+    // Also group the pnpm in the packageManager in package.json.
     {
       "automerge": true,
-      "matchFileNames": ["Dockerfile"],
-      "matchUpdateTypes": ["!major"],
-      "semanticCommitType": "fix"
+      "groupName": "CI dependencies",
+      "groupSlug": "ci",
+      "matchPackageNames": ["pnpm"],
+      "semanticCommitType": "ci"
     },
-    {
-      "matchFileNames": ["Dockerfile"],
-      "matchUpdateTypes": ["major"],
-      "semanticCommitType": "feat"
-    },
+    // Automerge linters and formatters.
     {
       "automerge": true,
       "matchPackageNames": ["@biomejs/biome", "@types/node", "rolldown", "typescript"],
