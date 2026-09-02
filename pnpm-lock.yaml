@@ -12,8 +12,8 @@ importers:
         specifier: 0.84.4
         version: 0.84.4(ws@8.21.3)
       typebox:
-        specifier: 1.3.20
-        version: 1.3.20
+        specifier: 1.3.22
+        version: 1.3.22
     devDependencies:
       '@biomejs/biome':
         specifier: 2.5.11
@@ -826,8 +826,8 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
-  typebox@1.3.20:
-    resolution: {integrity: sha512-qAQnoUNakcqjoTqwDzvqcg5e/+i3FHnltXFmKAbc0tpTPKT86bVOUPuevp/vYQguWUMC7YsVTmk1FT5UpjB/wg==}
+  typebox@1.3.22:
+    resolution: {integrity: sha512-YoX6QdtuJR/+YpP/qXf9gJXTxvSuiUlKYgW3AilsOSLlsZe/VH6ILR5vhoJM5QXY//uzIRE7NYij3h2+nG9vRQ==}
 
   typebox@1.3.7:
     resolution: {integrity: sha512-meKuifc33Pccx0O6PdIzYMq3Og8zvP4TIi/a+Bw3AEMZMxOD0+RHGQvpglEe6Zdy3wZ8nqn/j95h8LUZLk/6Hg==}
@@ -1677,7 +1677,7 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  typebox@1.3.20: {}
+  typebox@1.3.22: {}
 
   typebox@1.3.7: {}
 
