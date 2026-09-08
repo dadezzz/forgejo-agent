@@ -5,7 +5,7 @@ concurrency:
 jobs:
   build:
     container:
-      image: git.zarantonello.dev/infra/ci-pnpm:v1.0.1@sha256:cc0fe239caf067d0270705aad16089a25383a9e76e0b98aa5966164c8cb19984
+      image: git.zarantonello.dev/infra/ci-pnpm:v1.1.1@sha256:ed87e9364a5448217835ebf4103ef275f15b0267a9580dec3ac716c1abaa0a26
       volumes:
         - forgejo-runner-cache-pnpm:/usr/local/pnpm/store
     name: Build the executable
