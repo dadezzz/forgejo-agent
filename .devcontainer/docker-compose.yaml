@@ -1,26 +1,4 @@
 services:
-  # Forgejo instance used by the integration tests (pnpm test:integration).
-  # Reachable from the workspace container at http://forgejo:3000.
-  forgejo:
-    environment:
-      FORGEJO__security__INSTALL_LOCK: "true"
-      FORGEJO__server__HTTP_PORT: "3000"
-      FORGEJO__server__ROOT_URL: http://forgejo:3000/
-      FORGEJO__service__DISABLE_REGISTRATION: "true"
-    healthcheck:
-      interval: 2s
-      retries: 30
-      test:
-        - CMD
-        - curl
-        - -sf
-        - http://localhost:3000/api/v1/version
-      timeout: 2s
-    image: codeberg.org/forgejo/forgejo:15.0.3
-    ports:
-      - 3000:3000
-    volumes:
-      - forgejo-test-data:/data
   workspace:
     entrypoint: sleep infinity
     image: git.zarantonello.dev/infra/ci-pnpm:v1.1.1@sha256:ed87e9364a5448217835ebf4103ef275f15b0267a9580dec3ac716c1abaa0a26
@@ -30,5 +8,4 @@ services:
     working_dir: /workspace
 
 volumes:
-  forgejo-test-data: {}
   pnpm-cache: {}
