@@ -3,4 +3,6 @@
 *.json
 *.jsonc
 *.ts
+# Shell scripts are checked by shellcheck, not prettier.
+*.sh
 pnpm-lock.yaml
