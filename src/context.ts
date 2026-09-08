@@ -11,6 +11,8 @@ export function getAuthContext() {
   };
 }
 
+export type AuthContext = ReturnType<typeof getAuthContext>;
+
 export async function getEventContext() {
   const repositoryName = Value.Parse(schema.repositoryFullNameSchema, process.env.FORGEJO_REPOSITORY);
   const issueNumber = Number(Value.Parse(Type.String(), process.env.CTX_ISSUE_NUMBER));
@@ -33,3 +35,5 @@ export async function getEventContext() {
     event,
   };
 }
+
+export type EventContext = Awaited<ReturnType<typeof getEventContext>>;

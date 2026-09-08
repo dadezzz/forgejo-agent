@@ -1,9 +1,6 @@
-import type { getAuthContext, getEventContext } from "./context.ts";
+import type { AuthContext, EventContext } from "./context.ts";
 
-export function buildPrompt(
-  authCtx: ReturnType<typeof getAuthContext>,
-  eventCtx: Awaited<ReturnType<typeof getEventContext>>,
-): string {
+export function buildPrompt(authCtx: AuthContext, eventCtx: EventContext): string {
   let prompt = `You are the ${authCtx.username} user operating in the context of Forgejo ${eventCtx.event.type} number ${eventCtx.event.number} in the repository ${eventCtx.repository.full_name}.`;
 
   prompt += `\n\nYou can use the \`git\` command through the \`bash\` tool. The repository is in the current directory.`;
