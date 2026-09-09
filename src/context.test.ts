@@ -1,83 +1,71 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { getAuthContext, getEventContext } from "./context.ts";
+import { describe, expect, it, vi } from "vitest";
+import { basicApiCtx, mockIssue, mockApiCtx, mockPr, tokenApiCtx } from "./tests/unit/fixtures.ts";
+import { ApiContext, getEventContext } from "./context.ts";
 
-vi.mock("./forgejo/index.ts", () => ({
+vi.mock(import("./forgejo/index.ts"), () => ({
   getIssue: vi.fn(),
   getIssueComments: vi.fn(),
-  getPullRequest: vi.fn(),
+  getPr: vi.fn(),
   getRepository: vi.fn(),
 }));
 
-import { getIssue, getIssueComments, getPullRequest, getRepository } from "./forgejo/index.ts";
+import { getIssue, getIssueComments, getPr, getRepository } from "./forgejo/index.ts";
 
-const mockedGetIssue = vi.mocked(getIssue);
-const mockedGetIssueComments = vi.mocked(getIssueComments);
-const mockedGetPullRequest = vi.mocked(getPullRequest);
-const mockedGetRepository = vi.mocked(getRepository);
+describe("ApiContext", () => {
+  it("parses variables from the environment", () => {
+    expect.assert(!tokenApiCtx.auth.basic);
 
-const issue = {
-  number: 1,
-  user: { username: "davide" },
-  title: "tests",
-  body: "body",
-  state: "open",
-  pull_request: null,
-};
+    vi.stubEnv("FORGEJO_API_URL", tokenApiCtx.url.toString());
+    vi.stubEnv("CTX_AUTH_TOKEN", tokenApiCtx.auth.token);
+    vi.stubEnv("CTX_AUTH_USERNAME", tokenApiCtx.auth.username);
 
-const pullRequest = {
-  number: 3,
-  user: { username: "davide" },
-  title: "feat",
-  body: "body",
-  state: "open",
-  head: { label: "feature/x" },
-  base: { label: "main" },
-};
-
-describe("getAuthContext", () => {
-  afterEach(() => vi.unstubAllEnvs());
-
-  it("parses token and username from the environment", () => {
-    vi.stubEnv("CTX_AUTH_TOKEN", "token-123");
-    vi.stubEnv("CTX_AUTH_USERNAME", "ci-bot");
-
-    expect(getAuthContext()).toEqual({ token: "token-123", username: "ci-bot" });
+    expect(ApiContext.fromEnv()).toEqual(tokenApiCtx);
   });
 
-  it("throws when the token is missing", () => {
-    vi.stubEnv("CTX_AUTH_TOKEN", "");
-    vi.stubEnv("CTX_AUTH_USERNAME", "ci-bot");
-
-    expect(() => getAuthContext()).toThrow();
+  it.for([
+    { url: "http://forgejo:3000/ai/v1", token: "token-123", username: "ci-bot" },
+    { url: "forgejo:3000/api/v1", token: "token-123", username: "ci-bot" },
+    { url: "", token: "token-123", username: "ci-bot" },
+    { url: "http://forgejo:3000/api/v1", token: "", username: "ci-bot" },
+    { url: "http://forgejo:3000/api/v1", token: "token-123", username: "" },
+  ])("throws when variables are missing or malformed", (badEnv) => {
+    vi.stubEnv("FORGEJO_API_URL", badEnv.url);
+    vi.stubEnv("CTX_AUTH_TOKEN", badEnv.token);
+    vi.stubEnv("CTX_AUTH_USERNAME", badEnv.username);
+    expect(() => ApiContext.fromEnv()).toThrow();
   });
 
-  it("throws when the username is missing", () => {
-    vi.stubEnv("CTX_AUTH_TOKEN", "token-123");
-    vi.stubEnv("CTX_AUTH_USERNAME", "");
+  it("checks that the authorization header is correct", () => {
+    expect(basicApiCtx.getAuthHttpHeader()).toBe("Basic dGVzdDp0ZXN0");
+    expect(tokenApiCtx.getAuthHttpHeader()).toBe(`Token test`);
+  });
 
-    expect(() => getAuthContext()).toThrow();
+  it("checks that the repo url isn't persisted inside the context", () => {
+    // Make a copy of the old url.
+    const oldUrl = new URL(mockApiCtx.url);
+    mockApiCtx.getAuthRepoUrl("owner/repo");
+    expect(mockApiCtx.url).toEqual(oldUrl);
+  });
+
+  it("checks that the repo url is correct", () => {
+    expect(tokenApiCtx.getAuthRepoUrl("owner/repo")).toBe("http://test:test@forgejo:3000/owner/repo.git");
+    expect(basicApiCtx.getAuthRepoUrl("owner/repo")).toBe("http://test:test@forgejo:3000/owner/repo.git");
   });
 });
 
 describe("getEventContext", () => {
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    // Needed to make the check at line 80 work.
-    vi.clearAllMocks();
-  });
-
   it("returns the repository and issue event with comments", async () => {
     vi.stubEnv("FORGEJO_REPOSITORY", "owner/repo");
     vi.stubEnv("CTX_ISSUE_NUMBER", "1");
     vi.stubEnv("CTX_EVENT_NAME", "issues_opened");
-    mockedGetIssue.mockResolvedValue(issue);
-    mockedGetIssueComments.mockResolvedValue([{ user: { username: "davide" }, body: "first", id: 1 }]);
-    mockedGetRepository.mockResolvedValue({ full_name: "owner/repo", default_branch: "main" });
+    vi.mocked(getIssue).mockResolvedValue(mockIssue);
+    vi.mocked(getIssueComments).mockResolvedValue([{ user: { username: "davide" }, body: "first", id: 1 }]);
+    vi.mocked(getRepository).mockResolvedValue({ full_name: "owner/repo", default_branch: "main" });
 
-    const ctx = await getEventContext();
+    const ctx = await getEventContext(mockApiCtx);
 
-    expect(mockedGetIssue).toHaveBeenCalledWith("owner/repo", 1);
-    expect(mockedGetPullRequest).not.toHaveBeenCalled();
+    expect(getIssue).toHaveBeenCalledWith(mockApiCtx, "owner/repo", 1);
+    expect(getPr).not.toHaveBeenCalled();
     expect(ctx.repository).toEqual({ full_name: "owner/repo", default_branch: "main" });
     expect(ctx.event.type).toBe("issue");
     expect(ctx.event.number).toBe(1);
@@ -89,17 +77,17 @@ describe("getEventContext", () => {
     vi.stubEnv("FORGEJO_REPOSITORY", "owner/repo");
     vi.stubEnv("CTX_ISSUE_NUMBER", "3");
     vi.stubEnv("CTX_EVENT_NAME", "pull_request_opened");
-    mockedGetIssue.mockResolvedValue({ ...issue, number: 3, pull_request: {} });
-    mockedGetPullRequest.mockResolvedValue(pullRequest);
-    mockedGetIssueComments.mockResolvedValue([]);
-    mockedGetRepository.mockResolvedValue({ full_name: "owner/repo", default_branch: "main" });
+    vi.mocked(getIssue).mockResolvedValue({ ...mockIssue, number: 3, pull_request: {} });
+    vi.mocked(getPr).mockResolvedValue(mockPr);
+    vi.mocked(getIssueComments).mockResolvedValue([]);
+    vi.mocked(getRepository).mockResolvedValue({ full_name: "owner/repo", default_branch: "main" });
 
-    const ctx = await getEventContext();
+    const ctx = await getEventContext(mockApiCtx);
 
-    expect(mockedGetPullRequest).toHaveBeenCalledWith("owner/repo", 3);
+    expect(getPr).toHaveBeenCalledWith(mockApiCtx, "owner/repo", 3);
     expect(ctx.event.type).toBe("pull request");
     if (ctx.event.type === "pull request") {
-      expect(ctx.event.head.label).toBe("feature/x");
+      expect(ctx.event.head.label).toBe("test");
       expect(ctx.event.base.label).toBe("main");
     }
   });
@@ -109,15 +97,15 @@ describe("getEventContext", () => {
     vi.stubEnv("CTX_ISSUE_NUMBER", "1");
     vi.stubEnv("CTX_EVENT_NAME", "issues_opened");
 
-    await expect(getEventContext()).rejects.toThrow();
+    await expect(getEventContext(mockApiCtx)).rejects.toThrow();
   });
 
   it("throws on an unsupported event name", async () => {
     vi.stubEnv("FORGEJO_REPOSITORY", "owner/repo");
     vi.stubEnv("CTX_ISSUE_NUMBER", "1");
     vi.stubEnv("CTX_EVENT_NAME", "issues_closed");
-    mockedGetIssue.mockResolvedValue(issue);
+    vi.mocked(getIssue).mockResolvedValue(mockIssue);
 
-    await expect(getEventContext()).rejects.toThrow();
+    await expect(getEventContext(mockApiCtx)).rejects.toThrow();
   });
 });

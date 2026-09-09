@@ -1,10 +1,11 @@
 import { defineTool } from "@earendil-works/pi-coding-agent";
 import Type from "typebox";
 import { getLatestCommitId } from "./git.ts";
-import { patchIssue, postIssue, postIssueComment, postPrReview, postPullRequest } from "./forgejo/index.ts";
+import { patchIssue, postIssue, postIssueComment, postPrReview, postPr } from "./forgejo/index.ts";
 import * as schemas from "./schemas.ts";
+import type { ApiContext, EventContext } from "./context.ts";
 
-export function createCloseIssueTool(defaultRepository: string, defaultIssueId: number) {
+export function createCloseIssueTool(apiCtx: ApiContext, eventCtx: EventContext) {
   return defineTool({
     label: "close-issue",
     name: "close-issue",
@@ -14,15 +15,15 @@ export function createCloseIssueTool(defaultRepository: string, defaultIssueId: 
       issueId: Type.Optional(schemas.issueIdSchema),
     }),
     execute: async (_toolCallId, params) => {
-      const repository = params.repository ?? defaultRepository;
-      const issueId = params.issueId ?? defaultIssueId;
-      const issue = await patchIssue(repository, Number(issueId), { state: "closed" });
+      const repository = params.repository ?? eventCtx.repository.full_name;
+      const issueId = params.issueId ?? eventCtx.event.number;
+      const issue = await patchIssue(apiCtx, repository, Number(issueId), { state: "closed" });
       return { content: [{ type: "text", text: `ok, closed issue ${issue.number}` }], details: null };
     },
   });
 }
 
-export function createCreateIssueTool(defaultRepository: string) {
+export function createCreateIssueTool(apiCtx: ApiContext, eventCtx: EventContext) {
   return defineTool({
     label: "create-issue",
     name: "create-issue",
@@ -33,14 +34,14 @@ export function createCreateIssueTool(defaultRepository: string) {
       body: Type.String({ description: "Content body of the issue" }),
     }),
     execute: async (_toolCallId, params) => {
-      const repository = params.repository ?? defaultRepository;
-      const issue = await postIssue(repository, { title: params.title, body: params.body });
+      const repository = params.repository ?? eventCtx.repository.full_name;
+      const issue = await postIssue(apiCtx, repository, { title: params.title, body: params.body });
       return { content: [{ type: "text", text: `ok, created issue ${issue.number}` }], details: null };
     },
   });
 }
 
-export function createCreateIssueCommentTool(defaultRepository: string, defaultIssueId: number) {
+export function createCreateIssueCommentTool(apiCtx: ApiContext, eventCtx: EventContext) {
   return defineTool({
     label: "create-issue-comment",
     name: "create-issue-comment",
@@ -51,15 +52,15 @@ export function createCreateIssueCommentTool(defaultRepository: string, defaultI
       body: Type.String({ description: "Body of the comment" }),
     }),
     execute: async (_toolCallId, params) => {
-      const repository = params.repository ?? defaultRepository;
-      const issueId = params.issueId ?? defaultIssueId;
-      const comment = await postIssueComment(repository, issueId, { body: params.body });
+      const repository = params.repository ?? eventCtx.repository.full_name;
+      const issueId = params.issueId ?? eventCtx.event.number;
+      const comment = await postIssueComment(apiCtx, repository, issueId, { body: params.body });
       return { content: [{ type: "text", text: `ok, created comment ${comment.id}` }], details: null };
     },
   });
 }
 
-export function createCreatePrTool(defaultRepository: string) {
+export function createCreatePrTool(apiCtx: ApiContext, eventCtx: EventContext) {
   return defineTool({
     label: "create-pr",
     name: "create-pr",
@@ -72,9 +73,9 @@ export function createCreatePrTool(defaultRepository: string) {
       base: Type.String({ description: "Name of the base branch" }),
     }),
     execute: async (_toolCallId, params) => {
-      const repository = params.repository ?? defaultRepository;
+      const repository = params.repository ?? eventCtx.repository.full_name;
 
-      const pr = await postPullRequest(repository, {
+      const pr = await postPr(apiCtx, repository, {
         title: params.title,
         body: params.body,
         head: params.head,
@@ -86,7 +87,7 @@ export function createCreatePrTool(defaultRepository: string) {
   });
 }
 
-export function createCreatePrReviewTool(defaultRepository: string, defaultPrId: number) {
+export function createCreatePrReviewTool(apiCtx: ApiContext, eventCtx: EventContext) {
   return defineTool({
     label: "create-pr-review",
     name: "create-pr-review",
@@ -108,10 +109,10 @@ export function createCreatePrReviewTool(defaultRepository: string, defaultPrId:
       verdict: schemas.prReviewEventSchema,
     }),
     execute: async (_toolCallId, params) => {
-      const repository = params.repository ?? defaultRepository;
-      const prId = params.prId ?? defaultPrId;
+      const repository = params.repository ?? eventCtx.repository.full_name;
+      const prId = params.prId ?? eventCtx.event.number;
 
-      const review = await postPrReview(repository, prId, {
+      const review = await postPrReview(apiCtx, repository, prId, {
         body: params.body,
         comments: params.comments.map((c) => ({
           body: c.body,

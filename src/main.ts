@@ -2,27 +2,27 @@ import { createAgentSession, SessionManager, type ToolDefinition } from "@earend
 import { inspect } from "node:util";
 import * as tools from "./tools.ts";
 import { buildPrompt } from "./prompt.ts";
-import { getAuthContext, getEventContext } from "./context.ts";
+import { ApiContext, getEventContext } from "./context.ts";
 import { checkoutRepository } from "./git.ts";
 
-const authCtx = getAuthContext();
-const eventCtx = await getEventContext();
+const apiCtx = ApiContext.fromEnv();
+const eventCtx = await getEventContext(apiCtx);
 
 if (eventCtx.event.type === "pull request") {
-  checkoutRepository(authCtx, eventCtx.repository.full_name, eventCtx.event.head.label, eventCtx.event.base.label);
+  checkoutRepository(apiCtx, eventCtx.repository.full_name, eventCtx.event.head.label, eventCtx.event.base.label);
 } else {
-  checkoutRepository(authCtx, eventCtx.repository.full_name, eventCtx.repository.default_branch);
+  checkoutRepository(apiCtx, eventCtx.repository.full_name, eventCtx.repository.default_branch);
 }
 
 const customTools: ToolDefinition[] = [
-  tools.createCloseIssueTool(eventCtx.repository.full_name, eventCtx.event.number),
-  tools.createCreateIssueTool(eventCtx.repository.full_name),
-  tools.createCreateIssueCommentTool(eventCtx.repository.full_name, eventCtx.event.number),
-  tools.createCreatePrTool(eventCtx.repository.full_name),
+  tools.createCloseIssueTool(apiCtx, eventCtx),
+  tools.createCreateIssueTool(apiCtx, eventCtx),
+  tools.createCreateIssueCommentTool(apiCtx, eventCtx),
+  tools.createCreatePrTool(apiCtx, eventCtx),
 ];
 
 if (eventCtx.event.name === "pull_request_review_requested") {
-  customTools.push(tools.createCreatePrReviewTool(eventCtx.repository.full_name, eventCtx.event.number));
+  customTools.push(tools.createCreatePrReviewTool(apiCtx, eventCtx));
 }
 
 const { session } = await createAgentSession({
@@ -70,7 +70,7 @@ session.subscribe((l) => {
   }
 });
 
-const userPrompt = buildPrompt(authCtx, eventCtx);
+const userPrompt = buildPrompt(apiCtx, eventCtx);
 console.log("::group::Prompt");
 console.log(userPrompt);
 console.log("::endgroup::");

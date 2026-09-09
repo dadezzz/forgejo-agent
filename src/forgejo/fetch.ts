@@ -1,28 +1,25 @@
-import { Type, type StaticParse, type TSchema } from "typebox";
-import { getAuthContext } from "../context.ts";
+import type { StaticParse, TSchema } from "typebox";
+import type { ApiContext } from "../context.ts";
 import Value from "typebox/value";
 
-export const apiUrl = Value.Parse(Type.String(), process.env.FORGEJO_API_URL);
-const authContext = getAuthContext();
-
 export async function forgejoFetch<const S extends TSchema>(
-  method: string,
+  apiContext: ApiContext,
   pathname: string,
-  body: BodyInit | null,
   responseSchema: S,
+  init: RequestInit = {},
 ): Promise<StaticParse<S>> {
   const headers = new Headers({
+    ...init.headers,
     accept: "application/json",
-    authorization: `Bearer ${authContext.token}`,
+    authorization: apiContext.getAuthHttpHeader(),
   });
-
-  if (body) {
-    headers.append("content-type", "application/json");
+  if (init.body) {
+    headers.set("content-type", "application/json");
   }
 
-  const response = await fetch(apiUrl + pathname, { method, headers, body });
+  const response = await fetch(apiContext.url + pathname, { ...init, headers });
   if (response.status >= 400) {
-    throw new Error(`fetch failed: ${await response.text()}`);
+    throw new Error(`api ${init.method ?? "GET"} ${pathname} failed: ${response.status} ${await response.text()}`);
   }
 
   const responseBody = await response.json();

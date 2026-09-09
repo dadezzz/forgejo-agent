@@ -9,108 +9,122 @@ import {
   repositorySchema,
 } from "../schemas.ts";
 import { forgejoFetch } from "./fetch.ts";
+import type { ApiContext } from "../context.ts";
 
-export async function getRepository(repositoryName: string) {
-  return await forgejoFetch("GET", `/repos/${repositoryName}`, null, repositorySchema);
+export async function getRepository(apiCtx: ApiContext, repo: string) {
+  return await forgejoFetch(apiCtx, `/repos/${repo}`, repositorySchema);
 }
 
-export async function getIssue(repositoryName: string, issueId: number) {
-  return await forgejoFetch("GET", `/repos/${repositoryName}/issues/${issueId}`, null, issueSchema);
+export async function getIssue(apiCtx: ApiContext, repo: string, issueId: number) {
+  return await forgejoFetch(apiCtx, `/repos/${repo}/issues/${issueId}`, issueSchema);
 }
 
-export async function patchIssue(
-  repositoryName: string,
-  issueId: number,
-  patch: { body?: string; title?: string; state?: "open" | "closed" },
-) {
-  return await forgejoFetch("PATCH", `/repos/${repositoryName}/issues/${issueId}`, JSON.stringify(patch), issueSchema);
+interface PatchIssueBody {
+  body?: string;
+  title?: string;
+  state?: "open" | "closed";
 }
 
-export async function postIssue(repositoryName: string, body: { body: string; title: string }) {
-  return await forgejoFetch("POST", `/repos/${repositoryName}/issues`, JSON.stringify(body), issueSchema);
+export async function patchIssue(apiCtx: ApiContext, repo: string, issueId: number, patch: PatchIssueBody) {
+  return await forgejoFetch(apiCtx, `/repos/${repo}/issues/${issueId}`, issueSchema, {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+  });
 }
 
-export async function getIssueComments(repositoryName: string, issueId: number) {
+interface PostIssueBody {
+  body: string;
+  title: string;
+}
+
+export async function postIssue(apiCtx: ApiContext, repo: string, body: PostIssueBody) {
+  return await forgejoFetch(apiCtx, `/repos/${repo}/issues`, issueSchema, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function getIssueComments(apiCtx: ApiContext, repo: string, issueId: number) {
+  return await forgejoFetch(apiCtx, `/repos/${repo}/issues/${issueId}/comments`, Type.Array(issueCommentSchema));
+}
+
+interface PostIssueCommentBody {
+  body: string;
+}
+
+export async function postIssueComment(apiCtx: ApiContext, repo: string, issueId: number, body: PostIssueCommentBody) {
+  return await forgejoFetch(apiCtx, `/repos/${repo}/issues/${issueId}/comments`, issueCommentSchema, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+interface PostPrBody {
+  title: string;
+  body: string;
+  head: string;
+  base: string;
+}
+
+export async function postPr(apiCtx: ApiContext, repo: string, body: PostPrBody) {
+  return await forgejoFetch(apiCtx, `/repos/${repo}/pulls`, pullRequestSchema, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function getPr(apiCtx: ApiContext, repo: string, prId: number) {
+  return await forgejoFetch(apiCtx, `/repos/${repo}/pulls/${prId}`, pullRequestSchema);
+}
+
+export async function getPrReviews(apiCtx: ApiContext, repo: string, prId: number) {
+  return await forgejoFetch(apiCtx, `/repos/${repo}/pulls/${prId}/reviews`, Type.Array(prReviewSchema));
+}
+
+export async function getPrReview(apiCtx: ApiContext, repo: string, prId: number, reviewId: number) {
+  return await forgejoFetch(apiCtx, `/repos/${repo}/pulls/${prId}/reviews/${reviewId}`, prReviewSchema);
+}
+
+export async function getPrReviewComments(apiCtx: ApiContext, repo: string, prId: number, reviewId: number) {
   return await forgejoFetch(
-    "GET",
-    `/repos/${repositoryName}/issues/${issueId}/comments`,
-    null,
-    Type.Array(issueCommentSchema),
-  );
-}
-
-export async function postIssueComment(repositoryName: string, issueId: number, body: { body: string }) {
-  return await forgejoFetch(
-    "POST",
-    `/repos/${repositoryName}/issues/${issueId}/comments`,
-    JSON.stringify(body),
-    issueCommentSchema,
-  );
-}
-
-export async function postPullRequest(
-  repositoryName: string,
-  body: { title: string; body: string; head: string; base: string },
-) {
-  return await forgejoFetch("POST", `/repos/${repositoryName}/pulls`, JSON.stringify(body), pullRequestSchema);
-}
-
-export async function getPullRequest(repositoryName: string, prId: number) {
-  return await forgejoFetch("GET", `/repos/${repositoryName}/pulls/${prId}`, null, pullRequestSchema);
-}
-
-export async function getPrReviews(repositoryName: string, prId: number) {
-  return await forgejoFetch("GET", `/repos/${repositoryName}/pulls/${prId}/reviews`, null, Type.Array(prReviewSchema));
-}
-
-export async function getPrReview(repositoryName: string, prId: number, reviewId: number) {
-  return await forgejoFetch("GET", `/repos/${repositoryName}/pulls/${prId}/reviews/${reviewId}`, null, prReviewSchema);
-}
-
-export async function getPrReviewComments(repositoryName: string, prId: number, reviewId: number) {
-  return await forgejoFetch(
-    "GET",
-    `/repos/${repositoryName}/pulls/${prId}/reviews/${reviewId}/comments`,
-    null,
+    apiCtx,
+    `/repos/${repo}/pulls/${prId}/reviews/${reviewId}/comments`,
     Type.Array(prReviewCommentSchema),
   );
 }
 
-interface PrReviewNewComment {
+interface PostPrReviewCommentBody {
   body: string;
   old_position: number;
   new_position: number;
   path: string;
 }
 
-export async function postPrReview(
-  repositoryName: string,
-  prId: number,
-  body: {
-    body: string;
-    commit_id: string;
-    event: StaticParse<typeof prReviewEventSchema>;
-    comments: PrReviewNewComment[];
-  },
-) {
-  return await forgejoFetch(
-    "POST",
-    `/repos/${repositoryName}/pulls/${prId}/reviews`,
-    JSON.stringify(body),
-    prReviewSchema,
-  );
+interface PostPrReviewBody {
+  body: string;
+  commit_id: string;
+  event: StaticParse<typeof prReviewEventSchema>;
+  comments: PostPrReviewCommentBody[];
+}
+
+export async function postPrReview(apiCtx: ApiContext, repo: string, prId: number, body: PostPrReviewBody) {
+  return await forgejoFetch(apiCtx, `/repos/${repo}/pulls/${prId}/reviews`, prReviewSchema, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }
 
 export async function postPrReviewComment(
-  repositoryName: string,
+  apiCtx: ApiContext,
+  repo: string,
   prId: number,
   reviewId: number,
-  body: PrReviewNewComment,
+  body: PostPrReviewCommentBody,
 ) {
   return await forgejoFetch(
-    "POST",
-    `/repos/${repositoryName}/pulls/${prId}/reviews/${reviewId}/comments`,
-    JSON.stringify(body),
+    apiCtx,
+    `/repos/${repo}/pulls/${prId}/reviews/${reviewId}/comments`,
     prReviewCommentSchema,
+    { method: "POST", body: JSON.stringify(body) },
   );
 }

@@ -10,7 +10,7 @@
     "lint:check": "biome lint",
     "lint:fix": "biome lint --fix",
     "test": "vitest run",
-    "test:unit": "vitest run src",
+    "test:unit": "vitest run --config .vitest/unit.config.ts",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {

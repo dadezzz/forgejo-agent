@@ -1,10 +1,12 @@
 import Type from "typebox";
 
+export const apiUrlSchema = Type.String({ pattern: /^https?:\/\/[^/]+\/api\/v1$/ });
+
 export const authTokenSchema = Type.String({ minLength: 1 });
 export const authUsernameSchema = Type.String({ minLength: 1 });
 
 export const repositoryFullNameSchema = Type.String({
-  pattern: /.+\/.+/,
+  pattern: /^[^/]+\/[^/]+$/,
   description: "Repository reference in owner/name format",
 });
 
