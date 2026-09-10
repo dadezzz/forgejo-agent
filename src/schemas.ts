@@ -49,7 +49,7 @@ export const issueCommentSchema = Type.Object({
   id: Type.Number(),
 });
 
-const branchSchema = Type.Object({
+const prBranchSchema = Type.Object({
   label: Type.String(),
 });
 
@@ -59,8 +59,8 @@ export const pullRequestSchema = Type.Object({
   title: Type.String(),
   body: Type.String(),
   state: issueStateSchema,
-  head: branchSchema,
-  base: branchSchema,
+  head: prBranchSchema,
+  base: prBranchSchema,
 });
 
 export const prReviewIdSchema = Type.Number({
@@ -79,4 +79,10 @@ export const prReviewCommentSchema = Type.Object({
 export const prReviewSchema = Type.Object({
   id: prReviewIdSchema,
   body: Type.String(),
+});
+
+export const branchSchema = Type.Object({
+  commit: Type.Object({
+    id: Type.String(),
+  }),
 });

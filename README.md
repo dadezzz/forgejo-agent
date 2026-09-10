@@ -60,6 +60,22 @@ The build produces a single self-contained binary using Node.js
 [SEA](https://nodejs.org/api/single-executable-applications.html) (Single
 Executable Application).
 
+## Testing
+
+Unit tests mock the network and run anywhere:
+
+```bash
+pnpm test:unit
+```
+
+Integration tests run against a real Forgejo instance that is started by the dev
+container (`.devcontainer/docker-compose.yaml`, reachable at
+`http://forgejo:3000`), so they must run from the workspace container:
+
+```bash
+pnpm test:integration
+```
+
 ## Project Structure
 
 ```
@@ -72,7 +88,8 @@ src/
 ├── context.ts    # Runtime context from environment
 ├── prompt.ts     # Prompt builder for the agent
 ├── tools.ts      # Custom Forgejo tools
-└── schemas.ts    # TypeBox schemas
+├── schemas.ts    # TypeBox schemas
+└── test/         # Unit and integration tests
 examples/
 └── event_payloads/  # Sample webhook payloads
 ```

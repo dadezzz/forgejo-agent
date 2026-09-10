@@ -29,7 +29,15 @@ pnpm lint:check    # Biome lint check
 pnpm format:check  # Biome format check
 pnpm lint:fix      # Biome lint with auto-fix
 pnpm format:fix    # Biome format with auto-fix
+pnpm test          # Unit tests (same as pnpm test:unit)
+pnpm test:unit     # Unit tests only
+pnpm test:integration  # Integration tests (needs the devcontainer Forgejo instance)
+pnpm test:coverage # Unit tests with coverage
 ```
+
+Unit tests live in `src/test/unit/` and mock the network. Integration tests
+(`src/test/integration/`) run against the Forgejo instance started by
+`.devcontainer/docker-compose.yaml` from within the workspace container.
 
 ## Architecture
 
@@ -45,8 +53,9 @@ The agent follows a simple flow:
 4. **Forgejo Client** (`src/forgejo/`) — Split into `fetch.ts` (HTTP client) and
    `index.ts` (API endpoint functions wrapping the Forgejo REST API for issues,
    comments, and pull requests).
-5. **Custom Tools** (`src/tools.ts`) — Four tools exposed to the agent:
-   `close-issue`, `create-issue`, `create-issue-comment`, `create-pull-request`.
+5. **Custom Tools** (`src/tools.ts`) — Seven tools exposed to the agent:
+   `close-issue`, `create-issue`, `search-issues`, `create-issue-comment`,
+   `create-pr`, `search-prs`, `create-pr-review`.
 6. **Entry Point** (`src/main.ts`) — Clones the repository, creates a Pi agent
    session with the custom tools, logs tool calls and messages, and runs the
    prompt.
@@ -71,8 +80,9 @@ it must use `create-pull-request` to propose changes.
   and updates `action.yaml`.
 - **Container:** `ci.Dockerfile` for building the image used in CI (Node 26 +
   pnpm + curl + git).
-- **Dev Container:** `.devcontainer/` for local development. Uses the same image
-  as CI.
+- **Dev Container:** `.devcontainer/` for local development. Runs the same image
+  as CI plus a Forgejo instance (with seeded admin/bot users) that the
+  integration tests target at `http://forgejo:3000`.
 
 ## Conventions
 

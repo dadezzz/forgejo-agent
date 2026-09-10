@@ -9,7 +9,7 @@
     "format:fix": "biome format --fix",
     "lint:check": "biome lint",
     "lint:fix": "biome lint --fix",
-    "test": "vitest run",
+    "test:integration": "vitest run --config .vitest/integration.config.ts",
     "test:unit": "vitest run --config .vitest/unit.config.ts",
     "test:coverage": "vitest run --coverage"
   },

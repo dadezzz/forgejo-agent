@@ -1,4 +1,33 @@
 services:
+  forgejo:
+    entrypoint:
+      - sh
+      - -c
+      - |
+        # Initialize forgejo config.
+        /usr/local/bin/docker-setup.sh
+        # Initalize forgejo database.
+        forgejo migrate
+
+        # Create test user
+        forgejo admin user create \
+          --username "$$FORGEJO_USERNAME" \
+          --password "$$FORGEJO_PASSWORD" \
+          --email "$$FORGEJO_USERNAME@example.com" \
+          --must-change-password=false || true
+
+        # Run web server
+        exec /usr/bin/dumb-init -- forgejo web
+    env_file: ../src/test/integration/forgejo.env
+    environment:
+      FORGEJO__security__INSTALL_LOCK: true
+      FORGEJO__server__ROOT_URL: http://forgejo:3000/
+    image: codeberg.org/forgejo/forgejo:16.0.3-rootless
+    ports:
+      - 3000:3000
+    volumes:
+      - forgejo-data:/var/lib/gitea
+
   workspace:
     entrypoint: sleep infinity
     image: git.zarantonello.dev/infra/ci-pnpm:v1.1.2@sha256:c983897318782b8c272bbefee3701268cceda980a7c0d0c38c801f575a014a44
@@ -8,4 +37,5 @@ services:
     working_dir: /workspace
 
 volumes:
+  forgejo-data: {}
   pnpm-cache: {}
