@@ -19,6 +19,25 @@ export async function getIssue(apiCtx: ApiContext, repo: string, issueId: number
   return await forgejoFetch(apiCtx, `/repos/${repo}/issues/${issueId}`, issueSchema);
 }
 
+interface SearchIssuesParams {
+  query?: string;
+  state?: "open" | "closed";
+  limit?: number;
+  page?: number;
+}
+
+export async function searchIssues(apiCtx: ApiContext, repo: string, params: SearchIssuesParams) {
+  const urlParams = new URLSearchParams({
+    q: params.query ?? "",
+    type: "issues",
+    state: params.state ?? "",
+    limit: params.limit?.toString() ?? "",
+    page: params.page?.toString() ?? "",
+  });
+
+  return await forgejoFetch(apiCtx, `/repos/${repo}/issues?${urlParams.toString()}`, Type.Array(issueSchema));
+}
+
 interface PatchIssueBody {
   body?: string;
   title?: string;
@@ -75,6 +94,24 @@ export async function postPr(apiCtx: ApiContext, repo: string, body: PostPrBody)
 
 export async function getPr(apiCtx: ApiContext, repo: string, prId: number) {
   return await forgejoFetch(apiCtx, `/repos/${repo}/pulls/${prId}`, pullRequestSchema);
+}
+
+export async function searchPrs(apiCtx: ApiContext, repo: string, params: SearchIssuesParams) {
+  const urlParams = new URLSearchParams({
+    q: params.query ?? "",
+    type: "pulls",
+    state: params.state ?? "",
+    limit: params.limit?.toString() ?? "",
+    page: params.page?.toString() ?? "",
+  });
+
+  const issues = await forgejoFetch(
+    apiCtx,
+    `/repos/${repo}/issues?${urlParams.toString()}`,
+    Type.Array(pullRequestSchema),
+  );
+
+  return Promise.all(issues.map((i) => getPr(apiCtx, repo, i.number)));
 }
 
 export async function getPrReviews(apiCtx: ApiContext, repo: string, prId: number) {

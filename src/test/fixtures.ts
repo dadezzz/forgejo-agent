@@ -1,4 +1,6 @@
+import type { StaticParse } from "typebox";
 import { ApiContext, type EventContext } from "../context.ts";
+import type * as schemas from "../schemas.ts";
 
 export const tokenApiCtx = new ApiContext(new URL("http://forgejo:3000/api/v1"), {
   basic: false,
@@ -14,7 +16,7 @@ export const basicApiCtx = new ApiContext(new URL("http://forgejo:3000/api/v1"),
 
 export const mockApiCtx = tokenApiCtx;
 
-export const mockIssue = {
+export const mockIssue: StaticParse<typeof schemas.issueSchema> = {
   number: 1,
   user: { username: "test" },
   title: "test title",
@@ -23,7 +25,7 @@ export const mockIssue = {
   pull_request: null,
 };
 
-export const mockPr = {
+export const mockPr: StaticParse<typeof schemas.pullRequestSchema> = {
   number: 3,
   user: { username: "test" },
   title: "test title",

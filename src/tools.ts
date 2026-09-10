@@ -1,7 +1,15 @@
 import { defineTool } from "@earendil-works/pi-coding-agent";
 import Type from "typebox";
 import { getLatestCommitId } from "./git.ts";
-import { patchIssue, postIssue, postIssueComment, postPrReview, postPr } from "./forgejo/index.ts";
+import {
+  patchIssue,
+  postIssue,
+  postIssueComment,
+  postPrReview,
+  postPr,
+  searchPrs,
+  searchIssues,
+} from "./forgejo/index.ts";
 import * as schemas from "./schemas.ts";
 import type { ApiContext, EventContext } from "./context.ts";
 
@@ -37,6 +45,26 @@ export function createCreateIssueTool(apiCtx: ApiContext, eventCtx: EventContext
       const repository = params.repository ?? eventCtx.repository.full_name;
       const issue = await postIssue(apiCtx, repository, { title: params.title, body: params.body });
       return { content: [{ type: "text", text: `ok, created issue ${issue.number}` }], details: null };
+    },
+  });
+}
+
+export function createSearchIssuesTool(apiCtx: ApiContext, eventCtx: EventContext) {
+  return defineTool({
+    label: "search-issues",
+    name: "search-issues",
+    description: "Search issues",
+    parameters: Type.Object({
+      repository: Type.Optional(schemas.repositoryFullNameSchema),
+      state: Type.Optional(schemas.issueStateSchema),
+      query: Type.Optional(Type.String({ description: "Issue text search query" })),
+      page: Type.Optional(Type.Number({ description: "Number of the page", minimum: 1 })),
+      limit: Type.Optional(Type.Number({ description: "Max number of results per page", minimum: 1 })),
+    }),
+    execute: async (_toolCallId, params) => {
+      const repository = params.repository ?? eventCtx.repository.full_name;
+      const issues = await searchIssues(apiCtx, repository, params);
+      return { content: [{ type: "text", text: JSON.stringify(issues) }], details: null };
     },
   });
 }
@@ -83,6 +111,26 @@ export function createCreatePrTool(apiCtx: ApiContext, eventCtx: EventContext) {
       });
 
       return { content: [{ type: "text", text: `ok, created pull request ${pr.number}` }], details: null };
+    },
+  });
+}
+
+export function createSearchPrsTool(apiCtx: ApiContext, eventCtx: EventContext) {
+  return defineTool({
+    label: "search-prs",
+    name: "search-prs",
+    description: "Search prs",
+    parameters: Type.Object({
+      repository: Type.Optional(schemas.repositoryFullNameSchema),
+      state: Type.Optional(schemas.issueStateSchema),
+      query: Type.Optional(Type.String({ description: "Pr text search query" })),
+      page: Type.Optional(Type.Number({ description: "Number of the page", minimum: 1 })),
+      limit: Type.Optional(Type.Number({ description: "Max number of results per page", minimum: 1 })),
+    }),
+    execute: async (_toolCallId, params) => {
+      const repository = params.repository ?? eventCtx.repository.full_name;
+      const prs = await searchPrs(apiCtx, repository, params);
+      return { content: [{ type: "text", text: JSON.stringify(prs) }], details: null };
     },
   });
 }

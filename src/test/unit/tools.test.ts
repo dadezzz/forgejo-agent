@@ -1,11 +1,21 @@
 import { describe, expect, it, vi } from "vitest";
-import { patchIssue, postIssue, postIssueComment, postPrReview, postPr } from "../../forgejo/index.ts";
+import {
+  patchIssue,
+  postIssue,
+  postIssueComment,
+  postPrReview,
+  postPr,
+  searchIssues,
+  searchPrs,
+} from "../../forgejo/index.ts";
 import {
   createCloseIssueTool,
   createCreateIssueCommentTool,
   createCreateIssueTool,
   createCreatePrReviewTool,
   createCreatePrTool,
+  createSearchIssuesTool,
+  createSearchPrsTool,
 } from "../../tools.ts";
 import { mockIssue, mockApiCtx, mockNewIssueEventCtx, mockNewPrEventCtx, mockPr } from "../fixtures.ts";
 import { getLatestCommitId } from "../../git.ts";
@@ -17,6 +27,8 @@ vi.mock(import("../../forgejo/index.ts"), () => ({
   postIssueComment: vi.fn(),
   postPrReview: vi.fn(),
   postPr: vi.fn(),
+  searchIssues: vi.fn(),
+  searchPrs: vi.fn(),
 }));
 
 vi.mocked(patchIssue).mockResolvedValue(mockIssue);
@@ -24,6 +36,8 @@ vi.mocked(postIssue).mockResolvedValue(mockIssue);
 vi.mocked(postIssueComment).mockResolvedValue({ user: { username: "ci-bot" }, body: "b", id: 5 });
 vi.mocked(postPrReview).mockResolvedValue({ id: 7, body: "ok" });
 vi.mocked(postPr).mockResolvedValue(mockPr);
+vi.mocked(searchIssues).mockResolvedValue([mockIssue]);
+vi.mocked(searchPrs).mockResolvedValue([mockPr]);
 
 describe("createCloseIssueTool", () => {
   it("closes the default issue in the default repository", async () => {
@@ -86,7 +100,44 @@ describe("createCreatePrTool", () => {
       head: "feature/x",
       base: "main",
     });
+
     expect(result).toEqual({ content: [{ type: "text", text: "ok, created pull request 3" }], details: null });
+  });
+});
+
+describe("createSearchIssuesTool", () => {
+  it("searches issues in the default repository with the given parameters", async () => {
+    const tool = createSearchIssuesTool(mockApiCtx, mockNewIssueEventCtx);
+
+    const result = await simpleExecute(tool, { query: "bug", state: "open", limit: 10, page: 2 });
+
+    expect(searchIssues).toHaveBeenCalledWith(mockApiCtx, "owner/repo", {
+      query: "bug",
+      state: "open",
+      limit: 10,
+      page: 2,
+    });
+
+    expect(result).toEqual({ content: [{ type: "text", text: JSON.stringify([mockIssue]) }], details: null });
+  });
+
+  it("uses the default repository and doesn't pass explicit params when omitted", async () => {
+    const tool = createSearchIssuesTool(mockApiCtx, mockNewIssueEventCtx);
+
+    await simpleExecute(tool, { state: "closed" });
+
+    expect(searchIssues).toHaveBeenCalledWith(mockApiCtx, "owner/repo", { state: "closed" });
+  });
+});
+
+describe("createSearchPrsTool", () => {
+  it("searches pull requests in the default repository with the given parameters", async () => {
+    const tool = createSearchPrsTool(mockApiCtx, mockNewPrEventCtx);
+
+    const result = await simpleExecute(tool, { query: "testing", state: "open" });
+
+    expect(searchPrs).toHaveBeenCalledWith(mockApiCtx, "owner/repo", { query: "testing", state: "open" });
+    expect(result).toEqual({ content: [{ type: "text", text: JSON.stringify([mockPr]) }], details: null });
   });
 });
 

@@ -19,6 +19,8 @@ const customTools: ToolDefinition[] = [
   tools.createCreateIssueTool(apiCtx, eventCtx),
   tools.createCreateIssueCommentTool(apiCtx, eventCtx),
   tools.createCreatePrTool(apiCtx, eventCtx),
+  tools.createSearchIssuesTool(apiCtx, eventCtx),
+  tools.createSearchPrsTool(apiCtx, eventCtx),
 ];
 
 if (eventCtx.event.name === "pull_request_review_requested") {

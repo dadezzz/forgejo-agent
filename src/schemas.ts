@@ -30,7 +30,9 @@ const issueUserSchema = Type.Object({
   username: Type.String(),
 });
 
-const issueStateSchema = Type.Union([Type.Literal("open"), "closed"]);
+export const issueStateSchema = Type.Union([Type.Literal("open"), Type.Literal("closed")], {
+  description: "Open/closed state of the issue",
+});
 
 export const issueSchema = Type.Object({
   number: Type.Number(),
