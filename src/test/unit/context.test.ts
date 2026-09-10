@@ -1,15 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
-import { basicApiCtx, mockIssue, mockApiCtx, mockPr, tokenApiCtx } from "./tests/unit/fixtures.ts";
-import { ApiContext, getEventContext } from "./context.ts";
+import { basicApiCtx, mockIssue, mockApiCtx, mockPr, tokenApiCtx } from "../fixtures.ts";
+import { ApiContext, getEventContext } from "../../context.ts";
 
-vi.mock(import("./forgejo/index.ts"), () => ({
+vi.mock(import("../../forgejo/index.ts"), () => ({
   getIssue: vi.fn(),
   getIssueComments: vi.fn(),
   getPr: vi.fn(),
   getRepository: vi.fn(),
 }));
 
-import { getIssue, getIssueComments, getPr, getRepository } from "./forgejo/index.ts";
+import { getIssue, getIssueComments, getPr, getRepository } from "../../forgejo/index.ts";
 
 describe("ApiContext", () => {
   it("parses variables from the environment", () => {

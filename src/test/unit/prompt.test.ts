@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { buildPrompt } from "./prompt.ts";
-import type { EventContext } from "./context.ts";
-import { mockNewIssueEventCtx, mockApiCtx, mockNewPrEventCtx } from "./tests/unit/fixtures.ts";
+import { buildPrompt } from "../../prompt.ts";
+import type { EventContext } from "../../context.ts";
+import { mockNewIssueEventCtx, mockApiCtx, mockNewPrEventCtx } from "../fixtures.ts";
 
 describe("buildPrompt", () => {
   it("builds an issue prompt", () => {

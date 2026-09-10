@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Value from "typebox/value";
-import { eventNameSchema } from "./schemas.ts";
+import { eventNameSchema } from "../../schemas.ts";
 
 describe("eventNameSchema", () => {
   it("accepts the four supported events", () => {

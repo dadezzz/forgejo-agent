@@ -1,4 +1,4 @@
-import { ApiContext, type EventContext } from "../../context.ts";
+import { ApiContext, type EventContext } from "../context.ts";
 
 export const tokenApiCtx = new ApiContext(new URL("http://forgejo:3000/api/v1"), {
   basic: false,
