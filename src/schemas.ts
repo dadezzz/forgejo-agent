@@ -74,11 +74,19 @@ export const prReviewEventSchema = Type.Union(
 
 export const prReviewCommentSchema = Type.Object({
   body: Type.String(),
+  user: issueUserSchema,
+  path: Type.String(),
+  position: Type.Union([Type.Number(), Type.Null()]),
+  created_at: Type.String(),
 });
 
 export const prReviewSchema = Type.Object({
   id: prReviewIdSchema,
   body: Type.String(),
+  user: issueUserSchema,
+  state: Type.String(),
+  commit_id: Type.String(),
+  submitted_at: Type.String(),
 });
 
 export const branchSchema = Type.Object({

@@ -9,6 +9,20 @@ export const apiCtx = new ApiContext(new URL("http://forgejo:3000/api/v1"), {
   username: FORGEJO_USERNAME,
 });
 
+// A second user created by the setup through the admin API (test-bot is an
+// admin) and added as a collaborator (write) to the seed repository. Forgejo
+// forbids approving or rejecting your own pull request, so the reviewer
+// verdicts (APPROVED/REQUEST_CHANGES) run as this user while test-bot creates
+// the PRs.
+export const FORGEJO_REVIEWER_PASSWORD = "test-reviewer";
+export const FORGEJO_REVIEWER_USERNAME = "test-reviewer-123";
+
+export const reviewerApiCtx = new ApiContext(new URL("http://forgejo:3000/api/v1"), {
+  basic: true,
+  password: FORGEJO_REVIEWER_PASSWORD,
+  username: FORGEJO_REVIEWER_USERNAME,
+});
+
 export const SEED_REPOSITORY_NAME = "integration-tests";
 export const SEED_REPOSITORY = `${FORGEJO_USERNAME}/${SEED_REPOSITORY_NAME}`;
 

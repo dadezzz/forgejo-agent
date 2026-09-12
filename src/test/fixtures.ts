@@ -47,6 +47,7 @@ export const mockNewIssueEventCtx: EventContext = {
     pull_request: null,
     name: "issues_opened",
     comments: [],
+    reviews: null,
   },
 };
 
@@ -63,5 +64,43 @@ export const mockNewPrEventCtx: EventContext = {
     base: { label: "main" },
     name: "pull_request_opened",
     comments: [],
+    reviews: null,
+  },
+};
+
+export const mockReview: StaticParse<typeof schemas.prReviewSchema> & {
+  comments: StaticParse<typeof schemas.prReviewCommentSchema>[];
+} = {
+  id: 1,
+  body: "found an issue",
+  user: { username: "test" },
+  state: "REQUEST_CHANGES",
+  commit_id: "abc123",
+  submitted_at: "2024-01-01T00:00:00Z",
+  comments: [
+    {
+      body: "this line is wrong",
+      user: { username: "test" },
+      path: "src/main.ts",
+      position: 42,
+      created_at: "2024-01-01T00:00:00Z",
+    },
+  ],
+};
+
+export const mockReviewRequestedEventCtx: EventContext = {
+  repository: { full_name: "owner/repo", default_branch: "main" },
+  event: {
+    type: "pull request",
+    number: 3,
+    user: { username: "test" },
+    title: "feat: add tests",
+    body: "adds the test suite",
+    state: "open",
+    head: { label: "feature/tests" },
+    base: { label: "main" },
+    name: "pull_request_review_requested",
+    comments: [],
+    reviews: [mockReview],
   },
 };

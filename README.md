@@ -21,6 +21,7 @@ custom Forgejo API tools.
 - Creates, closes, and comments on issues
 - Creates pull requests when working on the default branch
 - Supports pull request review with findings submission
+- Gives the agent context on its previous reviews when re-assigned as reviewer
 
 ## Quick Start
 

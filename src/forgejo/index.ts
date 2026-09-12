@@ -112,7 +112,15 @@ export async function searchPrs(apiCtx: ApiContext, repo: string, params: Search
 }
 
 export async function getPrReviews(apiCtx: ApiContext, repo: string, prId: number) {
-  return await forgejoFetch(apiCtx, `/repos/${repo}/pulls/${prId}/reviews`, Type.Array(schemas.prReviewSchema));
+  const reviews = await forgejoFetch(
+    apiCtx,
+    `/repos/${repo}/pulls/${prId}/reviews`,
+    Type.Array(schemas.prReviewSchema),
+  );
+
+  // Pending reviews are drafts that haven't been submitted yet, so they carry
+  // no verdict and add no value to the review history.
+  return reviews.filter((review) => review.state !== "PENDING");
 }
 
 export async function getPrReview(apiCtx: ApiContext, repo: string, prId: number, reviewId: number) {
@@ -124,6 +132,17 @@ export async function getPrReviewComments(apiCtx: ApiContext, repo: string, prId
     apiCtx,
     `/repos/${repo}/pulls/${prId}/reviews/${reviewId}/comments`,
     Type.Array(schemas.prReviewCommentSchema),
+  );
+}
+
+export async function getPrReviewsWithComments(apiCtx: ApiContext, repo: string, prId: number) {
+  const reviews = await getPrReviews(apiCtx, repo, prId);
+
+  return await Promise.all(
+    reviews.map(async (review) => ({
+      ...review,
+      comments: await getPrReviewComments(apiCtx, repo, prId, review.id),
+    })),
   );
 }
 

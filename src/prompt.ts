@@ -16,6 +16,9 @@ export function buildPrompt(apiCtx: ApiContext, eventCtx: EventContext): string 
 
   if (eventCtx.event.name === "pull_request_review_requested") {
     prompt += `\n\nYou have been assigned as a reviewer of the pull request. Report any findings with the \`create-pr-review\` tool.`;
+    if (eventCtx.event.reviews && eventCtx.event.reviews.length > 0) {
+      prompt += `\nThis pull request has already been reviewed before. The previous reviews are listed below. For each issue you previously raised, check the current code to see whether it has been resolved: acknowledge the ones that are fixed, re-raise the ones that are still open, and look for any new issues introduced since your last review.`;
+    }
   } else {
     prompt += `\n\nAt the end, you must respond with a comment in the ${eventCtx.event.type} using the \`create-issue-comment\` tool.`;
   }
@@ -28,6 +31,24 @@ export function buildPrompt(apiCtx: ApiContext, eventCtx: EventContext): string 
     prompt += `\n### start comment from ${c.user.username} ###`;
     prompt += `\n${c.body}`;
     prompt += `\n### end comment ###`;
+  }
+
+  if (eventCtx.event.reviews && eventCtx.event.reviews.length > 0) {
+    prompt += `\n\n### start previous reviews ###`;
+    for (const review of eventCtx.event.reviews) {
+      prompt += `\n### start review from ${review.user.username} ###`;
+      prompt += `\nState: ${review.state}`;
+      prompt += `\nCommit: ${review.commit_id}`;
+      prompt += review.body ? `\n${review.body}` : "";
+      for (const c of review.comments) {
+        prompt += `\n### start review comment from ${c.user.username} ###`;
+        prompt += `\nPath: ${c.path}${c.position ? `, line: ${c.position}` : ""}`;
+        prompt += `\n${c.body}`;
+        prompt += `\n### end review comment ###`;
+      }
+      prompt += `\n### end review ###`;
+    }
+    prompt += `\n### end previous reviews ###`;
   }
 
   return prompt;

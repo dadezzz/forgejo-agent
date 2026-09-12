@@ -4,10 +4,11 @@
 // in the environment before any test file imports the client.
 //
 // The Forgejo instance is started by .devcontainer/docker-compose.yaml: it
-// creates the admin and bot users from src/test/integration/forgejo.env. This
-// setup seeds the repository with deterministic content: BASE_BRANCH with a
-// known README.md and HEAD_BRANCH with an extra line, plus a seed issue with a
-// comment, so every test run operates on fresh data.
+// creates the bot user (as admin, so the setup can provision further users)
+// from src/test/integration/forgejo.env; this setup creates the reviewer user
+// through the admin API and seeds the repository with deterministic content:
+// BASE_BRANCH with a known README.md and HEAD_BRANCH with an extra line, plus
+// a seed issue with a comment, so every test run operates on fresh data.
 
 import { execFileSync } from "node:child_process";
 import { appendFileSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -16,7 +17,51 @@ import { join } from "node:path";
 import Type from "typebox";
 import { forgejoFetch } from "../../forgejo/fetch.ts";
 import { postIssue, postIssueComment } from "../../forgejo/index.ts";
-import { apiCtx, BASE_BRANCH, FORGEJO_USERNAME, HEAD_BRANCH, SEED_REPOSITORY, SEED_REPOSITORY_NAME } from "./shared.ts";
+import {
+  apiCtx,
+  BASE_BRANCH,
+  FORGEJO_REVIEWER_PASSWORD,
+  FORGEJO_REVIEWER_USERNAME,
+  FORGEJO_USERNAME,
+  HEAD_BRANCH,
+  SEED_REPOSITORY,
+  SEED_REPOSITORY_NAME,
+} from "./shared.ts";
+
+// Provision the instance-level reviewer account. User accounts live in the
+// Forgejo volume and persist across runs, so the existence check makes this
+// idempotent (fresh volumes create the user via the admin API, re-runs skip
+// it). Forgejo forbids approving or rejecting your own pull request, so the
+// review verdicts (APPROVED/REQUEST_CHANGES) need a user other than the bot.
+async function ensureReviewerUser(): Promise<void> {
+  try {
+    await forgejoFetch(apiCtx, `/users/${FORGEJO_REVIEWER_USERNAME}`, Type.Object({}));
+    return;
+  } catch {
+    // 404: user does not exist.
+  }
+
+  await forgejoFetch(apiCtx, `/admin/users`, Type.Object({}), {
+    method: "POST",
+    body: JSON.stringify({
+      username: FORGEJO_REVIEWER_USERNAME,
+      email: `${FORGEJO_REVIEWER_USERNAME}@example.com`,
+      password: FORGEJO_REVIEWER_PASSWORD,
+      must_change_password: false,
+    }),
+  });
+}
+
+// The collaborator endpoint answers 204 No Content, so it bypasses forgejoFetch
+// (which always parses a JSON response) and is a plain PUT like the rest of the
+// provisioning. Write access makes the reviewer an official contributor: its
+// reviews come back with state APPROVED/REQUEST_CHANGES and are marked official.
+async function addReviewerCollaborator(): Promise<void> {
+  await forgejoFetch(apiCtx, `/repos/${SEED_REPOSITORY}/collaborators/${FORGEJO_REVIEWER_USERNAME}`, {
+    method: "PUT",
+    body: JSON.stringify({ permission: "write" }),
+  });
+}
 
 // Wait for the server to be healthy.
 const healthzUrl = new URL(apiCtx.url);
@@ -32,6 +77,10 @@ while (true) {
   await new Promise((resolve) => setTimeout(resolve, 2000));
 }
 
+// Create the reviewer user if it isn't there yet (test-bot is created by the
+// devcontainer entrypoint as an admin, so this goes through the admin API).
+await ensureReviewerUser();
+
 // Delete and recreate the repository so the data is deterministic.
 try {
   await forgejoFetch(apiCtx, `/repos/${SEED_REPOSITORY}`, Type.Object({}), { method: "DELETE" });
@@ -46,6 +95,10 @@ await forgejoFetch(apiCtx, `/user/repos`, Type.Object({}), {
     default_branch: BASE_BRANCH,
   }),
 });
+
+// Grant the reviewer write access to the fresh repository, so it can submit
+// approve/reject reviews as an official contributor.
+await addReviewerCollaborator();
 
 // Push deterministic base content and a change branch with a known diff. The
 // change branch appends a line to README.md, so the added line is at position

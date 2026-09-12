@@ -9,11 +9,15 @@ services:
         # Initalize forgejo database.
         forgejo migrate
 
-        # Create test user
+        # Create the test user as admin: the integration setup provisions the
+        # additional users (test-reviewer) through the admin API, keeping the
+        # instance bootstrap a single user creation that both the devcontainer
+        # and a CI forgejo service can share.
         forgejo admin user create \
           --username "$$FORGEJO_USERNAME" \
           --password "$$FORGEJO_PASSWORD" \
           --email "$$FORGEJO_USERNAME@example.com" \
+          --admin \
           --must-change-password=false || true
 
         # Run web server

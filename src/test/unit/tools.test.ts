@@ -34,7 +34,14 @@ vi.mock(import("../../forgejo/index.ts"), () => ({
 vi.mocked(patchIssue).mockResolvedValue(mockIssue);
 vi.mocked(postIssue).mockResolvedValue(mockIssue);
 vi.mocked(postIssueComment).mockResolvedValue({ user: { username: "ci-bot" }, body: "b", id: 5 });
-vi.mocked(postPrReview).mockResolvedValue({ id: 7, body: "ok" });
+vi.mocked(postPrReview).mockResolvedValue({
+  id: 7,
+  body: "ok",
+  user: { username: "ci-bot" },
+  state: "COMMENT",
+  commit_id: "abc123",
+  submitted_at: "2024-01-01T00:00:00Z",
+});
 vi.mocked(postPr).mockResolvedValue(mockPr);
 vi.mocked(searchIssues).mockResolvedValue([mockIssue]);
 vi.mocked(searchPrs).mockResolvedValue([mockPr]);

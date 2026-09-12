@@ -22,9 +22,13 @@ instance** running in the devcontainer. The payloads in
 live data so the schemas stay synced with the actual instance.
 
 The Forgejo service is defined in `.devcontainer/docker-compose.yaml`. On
-startup it reads `src/test/integration/forgejo.env` and creates the `test-admin`
-(admin) and `test-bot` users. From the workspace container the instance is
-reachable at `http://forgejo:3000`.
+startup it reads `src/test/integration/forgejo.env` and creates the `test-bot`
+user as an admin. The setup (`src/test/integration/setup.ts`) then creates the
+`test-reviewer` user through the admin API and adds it as a collaborator (write
+access) of the seed repository, so the review verdict
+(`APPROVED`/`REQUEST_CHANGES`) tests can run as a user different from the PR
+author (Forgejo forbids approving or rejecting your own pull request). From the
+workspace container the instance is reachable at `http://forgejo:3000`.
 
 ```bash
 pnpm test:integration

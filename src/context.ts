@@ -1,7 +1,7 @@
 import Value from "typebox/value";
 import * as schema from "./schemas.ts";
 import process from "node:process";
-import { getIssue, getIssueComments, getPr, getRepository } from "./forgejo/index.ts";
+import { getIssue, getIssueComments, getPr, getPrReviewsWithComments, getRepository } from "./forgejo/index.ts";
 import Type from "typebox";
 
 export class ApiContext {
@@ -51,10 +51,18 @@ export async function getEventContext(apiCtx: ApiContext) {
     pullRequest = await getPr(apiCtx, repositoryName, issueNumber);
   }
 
+  const eventName = Value.Parse(schema.eventNameSchema, process.env.CTX_EVENT_NAME);
+
+  let reviews = null;
+  if (eventName === "pull_request_review_requested" && pullRequest) {
+    reviews = await getPrReviewsWithComments(apiCtx, repositoryName, issueNumber);
+  }
+
   const event = {
     ...(pullRequest ? { type: "pull request" as const, ...pullRequest } : { type: "issue" as const, ...issue }),
-    name: Value.Parse(schema.eventNameSchema, process.env.CTX_EVENT_NAME),
+    name: eventName,
     comments: await getIssueComments(apiCtx, repositoryName, issueNumber),
+    reviews,
   };
 
   return {

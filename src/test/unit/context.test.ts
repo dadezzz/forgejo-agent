@@ -1,15 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
-import { basicApiCtx, mockIssue, mockApiCtx, mockPr, tokenApiCtx } from "../fixtures.ts";
+import { basicApiCtx, mockIssue, mockApiCtx, mockPr, mockReview, tokenApiCtx } from "../fixtures.ts";
 import { ApiContext, getEventContext } from "../../context.ts";
+import { getIssue, getIssueComments, getPr, getPrReviewsWithComments, getRepository } from "../../forgejo/index.ts";
 
 vi.mock(import("../../forgejo/index.ts"), () => ({
   getIssue: vi.fn(),
   getIssueComments: vi.fn(),
   getPr: vi.fn(),
+  getPrReviewsWithComments: vi.fn(),
   getRepository: vi.fn(),
 }));
-
-import { getIssue, getIssueComments, getPr, getRepository } from "../../forgejo/index.ts";
 
 describe("ApiContext", () => {
   it("parses variables from the environment", () => {
@@ -85,11 +85,43 @@ describe("getEventContext", () => {
     const ctx = await getEventContext(mockApiCtx);
 
     expect(getPr).toHaveBeenCalledWith(mockApiCtx, "owner/repo", 3);
+    expect(getPrReviewsWithComments).not.toHaveBeenCalled();
     expect(ctx.event.type).toBe("pull request");
     if (ctx.event.type === "pull request") {
       expect(ctx.event.head.label).toBe("test");
       expect(ctx.event.base.label).toBe("main");
     }
+  });
+
+  it("fetches previous reviews with comments on a review request", async () => {
+    vi.stubEnv("FORGEJO_REPOSITORY", "owner/repo");
+    vi.stubEnv("CTX_ISSUE_NUMBER", "3");
+    vi.stubEnv("CTX_EVENT_NAME", "pull_request_review_requested");
+    vi.mocked(getIssue).mockResolvedValue({ ...mockIssue, number: 3, pull_request: {} });
+    vi.mocked(getPr).mockResolvedValue(mockPr);
+    vi.mocked(getIssueComments).mockResolvedValue([]);
+    vi.mocked(getPrReviewsWithComments).mockResolvedValue([mockReview]);
+    vi.mocked(getRepository).mockResolvedValue({ full_name: "owner/repo", default_branch: "main" });
+
+    const ctx = await getEventContext(mockApiCtx);
+
+    expect(getPrReviewsWithComments).toHaveBeenCalledWith(mockApiCtx, "owner/repo", 3);
+    expect(ctx.event.reviews).toEqual([mockReview]);
+  });
+
+  it("does not fetch reviews for non-review events", async () => {
+    vi.stubEnv("FORGEJO_REPOSITORY", "owner/repo");
+    vi.stubEnv("CTX_ISSUE_NUMBER", "3");
+    vi.stubEnv("CTX_EVENT_NAME", "pull_request_opened");
+    vi.mocked(getIssue).mockResolvedValue({ ...mockIssue, number: 3, pull_request: {} });
+    vi.mocked(getPr).mockResolvedValue(mockPr);
+    vi.mocked(getIssueComments).mockResolvedValue([]);
+    vi.mocked(getRepository).mockResolvedValue({ full_name: "owner/repo", default_branch: "main" });
+
+    const ctx = await getEventContext(mockApiCtx);
+
+    expect(getPrReviewsWithComments).not.toHaveBeenCalled();
+    expect(ctx.event.reviews).toBeNull();
   });
 
   it("throws on an invalid repository name", async () => {
