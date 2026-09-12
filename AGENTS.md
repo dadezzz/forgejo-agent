@@ -29,7 +29,6 @@ pnpm lint:check    # Biome lint check
 pnpm format:check  # Biome format check
 pnpm lint:fix      # Biome lint with auto-fix
 pnpm format:fix    # Biome format with auto-fix
-pnpm test          # Unit tests (same as pnpm test:unit)
 pnpm test:unit     # Unit tests only
 pnpm test:integration  # Integration tests (needs the devcontainer Forgejo instance)
 pnpm test:coverage # Unit tests with coverage

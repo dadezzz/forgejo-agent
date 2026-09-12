@@ -4,11 +4,11 @@ import { forgejoFetch } from "./fetch.ts";
 import type { ApiContext } from "../context.ts";
 
 export async function getRepository(apiCtx: ApiContext, repo: string) {
-  return await forgejoFetch(apiCtx, `/repos/${repo}`, schemas.repositorySchema);
+  return await forgejoFetch(apiCtx, `/repos/${repo}`, schemas.repositorySchema, {});
 }
 
 export async function getIssue(apiCtx: ApiContext, repo: string, issueId: number) {
-  return await forgejoFetch(apiCtx, `/repos/${repo}/issues/${issueId}`, schemas.issueSchema);
+  return await forgejoFetch(apiCtx, `/repos/${repo}/issues/${issueId}`, schemas.issueSchema, {});
 }
 
 interface SearchIssuesParams {
@@ -27,7 +27,12 @@ export async function searchIssues(apiCtx: ApiContext, repo: string, params: Sea
     page: params.page?.toString() ?? "",
   });
 
-  return await forgejoFetch(apiCtx, `/repos/${repo}/issues?${urlParams.toString()}`, Type.Array(schemas.issueSchema));
+  return await forgejoFetch(
+    apiCtx,
+    `/repos/${repo}/issues?${urlParams.toString()}`,
+    Type.Array(schemas.issueSchema),
+    {},
+  );
 }
 
 interface PatchIssueBody {
@@ -60,6 +65,7 @@ export async function getIssueComments(apiCtx: ApiContext, repo: string, issueId
     apiCtx,
     `/repos/${repo}/issues/${issueId}/comments`,
     Type.Array(schemas.issueCommentSchema),
+    {},
   );
 }
 
@@ -89,7 +95,7 @@ export async function postPr(apiCtx: ApiContext, repo: string, body: PostPrBody)
 }
 
 export async function getPr(apiCtx: ApiContext, repo: string, prId: number) {
-  return await forgejoFetch(apiCtx, `/repos/${repo}/pulls/${prId}`, schemas.pullRequestSchema);
+  return await forgejoFetch(apiCtx, `/repos/${repo}/pulls/${prId}`, schemas.pullRequestSchema, {});
 }
 
 export async function searchPrs(apiCtx: ApiContext, repo: string, params: SearchIssuesParams) {
@@ -107,6 +113,7 @@ export async function searchPrs(apiCtx: ApiContext, repo: string, params: Search
     apiCtx,
     `/repos/${repo}/issues?${urlParams.toString()}`,
     Type.Array(schemas.issueSchema),
+    {},
   );
   return Promise.all(issues.map((i) => getPr(apiCtx, repo, i.number)));
 }
@@ -116,6 +123,7 @@ export async function getPrReviews(apiCtx: ApiContext, repo: string, prId: numbe
     apiCtx,
     `/repos/${repo}/pulls/${prId}/reviews`,
     Type.Array(schemas.prReviewSchema),
+    {},
   );
 
   // Pending reviews are drafts that haven't been submitted yet, so they carry
@@ -124,7 +132,7 @@ export async function getPrReviews(apiCtx: ApiContext, repo: string, prId: numbe
 }
 
 export async function getPrReview(apiCtx: ApiContext, repo: string, prId: number, reviewId: number) {
-  return await forgejoFetch(apiCtx, `/repos/${repo}/pulls/${prId}/reviews/${reviewId}`, schemas.prReviewSchema);
+  return await forgejoFetch(apiCtx, `/repos/${repo}/pulls/${prId}/reviews/${reviewId}`, schemas.prReviewSchema, {});
 }
 
 export async function getPrReviewComments(apiCtx: ApiContext, repo: string, prId: number, reviewId: number) {
@@ -132,6 +140,7 @@ export async function getPrReviewComments(apiCtx: ApiContext, repo: string, prId
     apiCtx,
     `/repos/${repo}/pulls/${prId}/reviews/${reviewId}/comments`,
     Type.Array(schemas.prReviewCommentSchema),
+    {},
   );
 }
 

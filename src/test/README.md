@@ -6,7 +6,6 @@ Pure functions (prompt building, schema validation, context parsing, tool
 parameter mapping, git helpers). No network, no containers — run on every PR.
 
 ```bash
-pnpm test        # same as pnpm test:unit
 pnpm test:unit
 pnpm test:coverage
 ```

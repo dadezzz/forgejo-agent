@@ -42,7 +42,7 @@ describe("getPrReviews", () => {
 
     const reviews = await getPrReviews(mockApiCtx, "owner/repo", 3);
 
-    expect(forgejoFetch).toHaveBeenCalledWith(mockApiCtx, "/repos/owner/repo/pulls/3/reviews", expect.anything());
+    expect(forgejoFetch).toHaveBeenCalledWith(mockApiCtx, "/repos/owner/repo/pulls/3/reviews", expect.anything(), {});
     expect(reviews).toEqual([submittedReview]);
   });
 
@@ -69,6 +69,7 @@ describe("getPrReviewsWithComments", () => {
       mockApiCtx,
       "/repos/owner/repo/pulls/3/reviews/1/comments",
       expect.anything(),
+      {},
     );
     expect(reviews).toEqual([{ ...submittedReview, comments: [inlineComment] }]);
   });

@@ -11,7 +11,7 @@
     "lint:fix": "biome lint --fix",
     "test:integration": "vitest run --config .vitest/integration.config.ts",
     "test:unit": "vitest run --config .vitest/unit.config.ts",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage --config .vitest/unit.config.ts"
   },
   "dependencies": {
     "@earendil-works/pi-coding-agent": "0.85.1",

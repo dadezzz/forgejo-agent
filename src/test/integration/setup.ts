@@ -14,7 +14,6 @@ import { execFileSync } from "node:child_process";
 import { appendFileSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import Type from "typebox";
 import { forgejoFetch } from "../../forgejo/fetch.ts";
 import { postIssue, postIssueComment } from "../../forgejo/index.ts";
 import {
@@ -27,6 +26,7 @@ import {
   SEED_REPOSITORY,
   SEED_REPOSITORY_NAME,
 } from "./shared.ts";
+import Type from "typebox";
 
 // Provision the instance-level reviewer account. User accounts live in the
 // Forgejo volume and persist across runs, so the existence check makes this
@@ -35,7 +35,7 @@ import {
 // review verdicts (APPROVED/REQUEST_CHANGES) need a user other than the bot.
 async function ensureReviewerUser(): Promise<void> {
   try {
-    await forgejoFetch(apiCtx, `/users/${FORGEJO_REVIEWER_USERNAME}`, Type.Object({}));
+    await forgejoFetch(apiCtx, `/users/${FORGEJO_REVIEWER_USERNAME}`, Type.Object({}), {});
     return;
   } catch {
     // 404: user does not exist.
@@ -57,18 +57,16 @@ async function ensureReviewerUser(): Promise<void> {
 // provisioning. Write access makes the reviewer an official contributor: its
 // reviews come back with state APPROVED/REQUEST_CHANGES and are marked official.
 async function addReviewerCollaborator(): Promise<void> {
-  await forgejoFetch(apiCtx, `/repos/${SEED_REPOSITORY}/collaborators/${FORGEJO_REVIEWER_USERNAME}`, {
+  await forgejoFetch(apiCtx, `/repos/${SEED_REPOSITORY}/collaborators/${FORGEJO_REVIEWER_USERNAME}`, Type.Object({}), {
     method: "PUT",
     body: JSON.stringify({ permission: "write" }),
   });
 }
 
 // Wait for the server to be healthy.
-const healthzUrl = new URL(apiCtx.url);
-healthzUrl.pathname = "/api/healthz";
 while (true) {
   try {
-    await fetch(healthzUrl);
+    await forgejoFetch(apiCtx, `/version`, Type.Object({}), {});
     break;
   } catch {
     // Not up yet, retry.

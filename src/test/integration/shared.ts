@@ -14,8 +14,8 @@ export const apiCtx = new ApiContext(new URL("http://forgejo:3000/api/v1"), {
 // forbids approving or rejecting your own pull request, so the reviewer
 // verdicts (APPROVED/REQUEST_CHANGES) run as this user while test-bot creates
 // the PRs.
-export const FORGEJO_REVIEWER_PASSWORD = "test-reviewer";
-export const FORGEJO_REVIEWER_USERNAME = "test-reviewer-123";
+export const FORGEJO_REVIEWER_PASSWORD = "test-reviewer-123";
+export const FORGEJO_REVIEWER_USERNAME = "test-reviewer";
 
 export const reviewerApiCtx = new ApiContext(new URL("http://forgejo:3000/api/v1"), {
   basic: true,
