@@ -34,7 +34,7 @@ services:
 
   workspace:
     entrypoint: sleep infinity
-    image: git.zarantonello.dev/infra/ci-pnpm:v1.1.5@sha256:d4011284a8cc8c627f8a3f94b8381b0ffaf1caff744c3ce5c9b64075553224ba
+    image: git.zarantonello.dev/infra/ci-pnpm:v1.1.7@sha256:35d75d27db7ed777a10cad500314c75e484b04f443b905e412079dd142f784b5
     volumes:
       - ..:/workspace:z,cached
       - pnpm-cache:/usr/local/pnpm/store
