@@ -22,7 +22,7 @@
     "@types/node": "25.9.7",
     "rolldown": "1.2.9",
     "typescript": "7.0.2",
-    "vitest": "5.0.0"
+    "vitest": "5.0.1"
   },
   "packageManager": "pnpm@12.4.2"
 }
