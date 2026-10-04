@@ -28,9 +28,16 @@
     // Automerge linters and formatters.
     {
       "automerge": true,
-      "matchPackageNames": ["@biomejs/biome", "@types/node", "rolldown", "typescript"],
+      "matchPackageNames": ["@biomejs/biome", "@types/node", "rolldown", "typescript", "vitest"],
       "matchUpdateTypes": ["!major"],
       "semanticCommitType": "chore"
+    },
+    // Automerge typebox patches.
+    {
+      "automerge": true,
+      "matchPackageNames": ["typebox"],
+      "matchUpdateTypes": ["!major", "!minor"],
+      "semanticCommitType": "fix"
     }
   ],
   "prHourlyLimit": 4
