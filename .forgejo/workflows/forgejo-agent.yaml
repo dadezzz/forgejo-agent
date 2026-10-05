@@ -1,7 +1,7 @@
 jobs:
   respond:
     container:
-      image: git.zarantonello.dev/infra/ci-pnpm:v1.1.13@sha256:a10e188c33c78648a4337fc626bd73b9e720cf0364352756fa6167cdb6d3814a
+      image: git.zarantonello.dev/infra/ci-pnpm:v1.1.14@sha256:eab15584dc5a8c81bae62012fa6ce7926033796563f72c953f8ca86580e199fe
       # The composite action in action.yaml can save the binary to speed up
       # subsequent runs.
       volumes:
