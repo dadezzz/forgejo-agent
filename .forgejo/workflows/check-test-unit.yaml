@@ -5,7 +5,7 @@ concurrency:
 jobs:
   check:
     container:
-      image: git.zarantonello.dev/infra/ci-pnpm:v1.1.18@sha256:437703240d77fe157c31f97cbb94a9c7fe124d9bd575a9b6e7aad2c8a30f7c83
+      image: git.zarantonello.dev/infra/ci-pnpm:v1.1.19@sha256:8c22923b6d32bebd769e7cf94fdcec9cab9c1f78a4e94c0dd36e715ad643a181
       volumes:
         - forgejo-runner-cache-pnpm:/usr/local/pnpm/store
     name: Run unit tests
