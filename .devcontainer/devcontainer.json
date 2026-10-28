@@ -1,4 +1,9 @@
 {
+  "customizations": {
+    "vscode": {
+      "extensions": ["biomejs.biome"]
+    }
+  },
   "dockerComposeFile": "docker-compose.yaml",
   "service": "workspace",
   "workspaceFolder": "/workspace"

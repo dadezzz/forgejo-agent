@@ -89,4 +89,3 @@ it must use `create-pull-request` to propose changes.
 - No framework — plain TypeScript with ES modules.
 - Biome for linting and formatting (`biome.jsonc`).
 - YAML linting via `.yamllint.yaml`.
-- Prettier ignore for generated files (`.prettierignore`).
