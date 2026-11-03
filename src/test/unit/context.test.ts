@@ -48,7 +48,7 @@ describe("ApiContext", () => {
   });
 
   it("checks that the repo url is correct", () => {
-    expect(tokenApiCtx.getAuthRepoUrl("owner/repo")).toBe("http://test:test@forgejo:3000/owner/repo.git");
+    expect(tokenApiCtx.getAuthRepoUrl("owner/repo")).toBe("http://test:x-oauth-basic@forgejo:3000/owner/repo.git");
     expect(basicApiCtx.getAuthRepoUrl("owner/repo")).toBe("http://test:test@forgejo:3000/owner/repo.git");
   });
 });
