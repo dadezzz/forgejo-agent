@@ -32,8 +32,8 @@ export class ApiContext {
   getAuthRepoUrl(repo: string): string {
     const url = new URL(this.url);
 
-    url.username = this.auth.username;
-    url.password = this.auth.basic ? this.auth.password : this.auth.token;
+    url.username = this.auth.basic ? this.auth.username : this.auth.token;
+    url.password = this.auth.basic ? this.auth.password : "x-oauth-basic";
     url.pathname = `${repo}.git`;
 
     return url.toString();
