@@ -1,7 +1,7 @@
 jobs:
   respond:
     container:
-      image: git.zarantonello.dev/infra/ci-pnpm:v2026.11.06.1@sha256:ac3fc21c248e945a6250ceed8cd20b837458f5193edbb14cf34b50cd35c25586
+      image: git.zarantonello.dev/infra/ci-pnpm:v2026.11.08.1@sha256:33059a9f1371d47f502bab672de35bbc15da76872aa17e03efe6fd916067f8ca
       # The composite action in action.yaml can save the binary to speed up
       # subsequent runs.
       volumes:
@@ -26,7 +26,7 @@ jobs:
           ${{ vars.PI_SETTINGS_JSON }}
           EOF
       - name: Generate response
-        uses: https://git.zarantonello.dev/projects/forgejo-agent@82de6301f65492b0275a9c3edd53e6246b554ce3 # v1.11.21
+        uses: https://git.zarantonello.dev/projects/forgejo-agent@5f8accf7cf69273ea5283da29567d27e4e99b57b # v1.11.22
         with:
           auth-token: ${{ secrets.CI_BOT_TOKEN }}
           auth-username: ci-bot
